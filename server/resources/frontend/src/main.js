@@ -1,11 +1,11 @@
-import '@app/utils'
+import '@app/utils.js'
 import '@/css/app.scss'
 import {createApp} from 'vue'
-import {createStore} from "@app/store";
-import {createRouter} from '@app/router'
+import {createStore} from "@app/store.js";
+import {createRouter} from '@app/router.js'
 import {Quasar} from 'quasar'
 import AppComponent from '@/App.vue'
-import routes from '@/routes'
+import routes from '@/routes.js'
 import quasarLang from 'quasar/lang/de-DE'
 import '@quasar/extras/material-icons/material-icons.css'
 import 'quasar/src/css/index.sass'

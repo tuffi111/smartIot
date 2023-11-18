@@ -1,8 +1,8 @@
 <script setup>
 import {onBeforeMount} from "vue";
 import {useStore} from 'vuex'
-import {MyModel} from "@/models/MyModel";
-import {MyApiModel} from "@/models/MyApiModel";
+import {MyModel} from "@/models/MyModel.js";
+import {MyApiModel} from "@/models/MyApiModel.js";
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
 import ModelView from "@/components/ModelView.vue";

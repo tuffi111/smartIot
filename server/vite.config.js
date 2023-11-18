@@ -44,13 +44,13 @@ export default defineConfig({
         }),
 
         laravel({
-            input: ['resources/frontend/main.js'],
+            input: ['@/main.js'],
             refresh: true,
         }),
     ],
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./resources/frontend', import.meta.url)),
+            '@': fileURLToPath(new URL('./resources/frontend/src', import.meta.url)),
             '@app': fileURLToPath(new URL('./resources/frontend/app', import.meta.url)),
         }
     }

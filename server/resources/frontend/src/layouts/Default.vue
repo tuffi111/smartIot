@@ -70,7 +70,7 @@
 
           <q-btn dense flat round @click="toggleRightDrawer">
             <q-avatar size="38px">
-              <img src="@/assets/avatar4.jpg" alt="Avatar">
+              <img src="../assets/avatar4.jpg" alt="Avatar">
             </q-avatar>
           </q-btn>
 
@@ -105,7 +105,7 @@
           <q-item>
             <q-item-section avatar>
               <q-avatar size="38px">
-                <img src="@/assets/avatar4.jpg" alt="Avatar">
+                <img src="../assets/avatar4.jpg" alt="Avatar">
               </q-avatar>
             </q-item-section>
             <q-item-section>

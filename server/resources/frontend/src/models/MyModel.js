@@ -1,4 +1,4 @@
-import {StoreModel} from "@app/models/StoreModel";
+import {StoreModel} from "@app/models/StoreModel.js";
 
 export class MyModel extends StoreModel {
     constructor(data = {}) {

@@ -20,6 +20,6 @@
 <body class="antialiased">
 <div id="app"></div>
 {{ Vite::useBuildDirectory('.') }}
-@vite('resources/frontend/main.js')
+@vite('resources/frontend/src/main.js')
 </body>
 </html>
