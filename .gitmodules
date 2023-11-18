@@ -1,0 +1,6 @@
+[submodule "device/frontend/app"]
+	path = device/frontend/app
+	url = git@github.com:tuffi111/smartIot-frontend.git
+[submodule "server/resources/frontend/app"]
+	path = server/resources/frontend/app
+	url = git@github.com:tuffi111/smartIot-frontend.git
