@@ -1,0 +1,46 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "-- BACKEND ----------": "",
+        "be-start": "vagrant up",
+        "be-ssh": "vagrant ssh",
+        "be-stop": "vagrant halt",
+        "-- FRONTEND ----------": "",
+        "fe-build-watch": "vagrant ssh -c \"cd code && npm run vite-build-watch\"",
+        "fe-build": "vagrant ssh -c \"cd code && npm run vite-build\"",
+        "fe-npm-install": "vagrant ssh -c \"cd code && npm i\"",
+        "-- VITE ----------": "",
+        "vite-dev": "vite",
+        "vite-build": "vite build --emptyOutDir",
+        "vite-preview": "vite preview",
+        "vite-build-watch": "vite build --watch --emptyOutDir"
+    },
+    "devDependencies": {
+        "@quasar/cli": "^2.3.0",
+        "@quasar/vite-plugin": "^1.6.0",
+        "@vitejs/plugin-vue": "^4.5.0",
+        "autoprefixer": "^10.4.16",
+        "eslint": "^8.54.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-vue": "^9.18.1",
+        "laravel-vite-plugin": "^0.8.1",
+        "postcss": "^8.4.31",
+        "prettier": "^3.1.0",
+        "sass": "^1.69.5",
+        "vite": "^4.5.0",
+        "vite-plugin-static-copy": "^0.17.1"
+    },
+    "dependencies": {
+        "@quasar/extras": "^1.16.8",
+        "@vitejs/plugin-vue": "^4.5.0",
+        "@vueuse/core": "^10.6.1",
+        "axios": "^1.6.2",
+        "quasar": "^2.14.0",
+        "vue": "^3.3.8",
+        "vue-i18n": "^9.7.0",
+        "vue-json-pretty": "^2.2.4",
+        "vue-router": "^4.2.5",
+        "vuex": "^4.1.0"
+    }
+}

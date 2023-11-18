@@ -1,0 +1,29 @@
+ip: 192.168.56.56
+memory: 2048
+cpus: 2
+provider: virtualbox
+authorize: ~/.ssh/id_rsa.pub
+keys:
+  - ~/.ssh/id_rsa
+folders:
+  - map: /home/tuffi/Dokumente/Arduino/smartIot/server
+    to: /home/vagrant/code
+sites:
+  - map: smart-server.test
+    to: /home/vagrant/code/public
+databases:
+  - smart-server
+features:
+  - pm2: true
+  - rabbitmq: true
+  - python: true
+  - mysql: true
+  - mailpit: true
+  - mariadb: false
+  - postgresql: false
+  - ohmyzsh: false
+  - webdriver: false
+services:
+  - enabled: [ mysql ]
+name: smartIotServer
+hostname: smart-iot-server
