@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\App as AppController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::middleware(Language::class)->group(function () {
+    Route::fallback([AppController::class, 'index']);
+
 
 Route::get('/', function () {
     return view('index');

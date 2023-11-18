@@ -53,6 +53,8 @@ export default defineConfig({
         alias: {
             '@': fileURLToPath(new URL('./resources/frontend/src', import.meta.url)),
             '@app': fileURLToPath(new URL('./resources/frontend/app', import.meta.url)),
+            'ziggy': path.resolve('vendor/tightenco/ziggy/dist/index.es'),
+            //'ziggyVue': path.resolve('vendor/tightenco/ziggy/dist/vue.es'),
         }
     }
 })
