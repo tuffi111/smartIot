@@ -14,10 +14,11 @@ use App\Http\Controllers\App as AppController;
 |
 */
 
-Route::middleware(Language::class)->group(function () {
+//Route::middleware(Language::class)->group(function () {
     Route::fallback([AppController::class, 'index']);
 
 
-Route::get('/', function () {
-    return view('index');
-});
+    Route::get('/', function () {
+        return view('index');
+    });
+//}
