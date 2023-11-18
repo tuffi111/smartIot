@@ -44,7 +44,8 @@ export default defineConfig({
         }),
 
         laravel({
-            input: ['@/main.js'],
+            input: ['./resources/frontend/src/main.js'],
+            buildDirectory: '.',
             refresh: true,
         }),
     ],
