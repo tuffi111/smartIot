@@ -30,9 +30,7 @@ class System
             }
         }
 
-        $run = trim(sprintf("%s %s", $repos, $cmd));
-        //echo "-> run command: $run\n";
-        exec($run, static::$result, static::$code);
+        exec(static::getRunCmd($repos, $cmd), static::$result, static::$code);
 
         if (!is_array(static::$result)) {
             static::$result = [static::$result];
@@ -45,6 +43,9 @@ class System
         return new static;
     }
 
+    /**
+     * @throws Exception
+     */
     static function script(string $cmd, ...$args): self
     {
         static::$result = null;
@@ -67,9 +68,7 @@ class System
             $cmd = './' . ltrim($cmd, './');
         }
 
-        $run = trim(sprintf("%s %s", $repos, $cmd));
-        //echo "-> run script: $run\n";
-        exec($run, static::$result, static::$code);
+        exec(static::getRunCmd($repos, $cmd), static::$result, static::$code);
 
         if (!is_array(static::$result)) {
             static::$result = [static::$result];
@@ -173,5 +172,10 @@ class System
     static function code(): int|null
     {
         return static::$code;
+    }
+
+    static protected function getRunCmd(string $repos, string $cmd): string
+    {
+        return trim(sprintf("%s %s", $repos, $cmd));
     }
 }

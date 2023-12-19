@@ -2,56 +2,18 @@
 
 namespace App\Lib\Command;
 
+
+use App\Lib\Utils\StopWatch;
+
 trait timer
 {
-    /** @var float */
-    private int|float $startedAt = 0;
-    /** @var float */
-    private int|float $stoppedAt = 0;
+    private ?StopWatch $timer = null;
 
-    protected function start(): self
+    function timer(): StopWatch
     {
-        $this->startedAt = $this->now();
-        return $this;
-    }
-
-
-    protected function stop(): self
-    {
-        $this->stoppedAt = $this->now();
-        return $this;
-    }
-
-    protected function duration(): float
-    {
-        if ($this->stoppedAt) {
-            return 0;
+        if (!$this->timer) {
+            $this->timer = new StopWatch();
         }
-
-        return $this->stoppedAt - $this->startedAt;
-    }
-
-    protected function intermediate(): float
-    {
-        if (!$this->startedAt) {
-            return 0;
-        }
-
-        return $this->now() - $this->startedAt;
-    }
-
-    protected function started(): float
-    {
-        return $this->startedAt;
-    }
-
-    protected function stopped(): float
-    {
-        return $this->stoppedAt;
-    }
-
-    protected function now(): float
-    {
-        return microtime(true);
+        return $this->timer;
     }
 }

@@ -2,32 +2,43 @@
 
 namespace App\Lib\Command;
 
-use Exception;
 use Closure;
-use Countable;
+use Exception;
+use Illuminate\Support\Collection;
 
 
+/**
+ * @method getOutput()
+ */
 trait statesBar
 {
+    use output;
     use states;
+    use timer;
 
-    /** @var mixed */
-    private $key;
+    private mixed $key;
 
     /**
-     * @param array|Countable $collection collection to iterate over.
-     * @param Closure $onItem called on each item of collection
-     * @param mixed|null $states class that make use of State trait. Holds the states while loop is running.
-     * @return Countable|array $collection
+     * @param array|Collection $collection collection to be processed (iterated over).
+     * @param Closure $onItem called on each item of the collection (the current item key can be retrieved via ->key())
+     * @param mixed|null $states class that make use of State trait. Holds the states while the loop is running.
+     * @param string $label
+     * @return Collection|array $collection Same collection passed to method.
      */
-    protected function withStatesBar(
-        $collection,
+    function withStatesBar(
+        array|Collection $collection,
         Closure $onItem,
-        $states = null,
+        mixed $states = null,
         string $label = 'Items'
-    ) {
+    ): Collection|array {
         if (!$states) {
             $states = $this;
+        }
+
+        if ($this->console()) {
+            $bar = $this->console()->getOutput()->createProgressBar(count($collection));
+        } else {
+            $bar = $this->getOutput()->createProgressBar(count($collection));
         }
 
         $runtime = 0;
@@ -40,13 +51,13 @@ trait statesBar
         $itemsEtaMinutes = 0;
         $itemsEtaHours = 0;
         $itemsLeft = 0;
-        $bar = $this->getOutput()->createProgressBar(count($collection));
+
         $bar->setRedrawFrequency(100);
         $bar->maxSecondsBetweenRedraws(3);
         $bar->minSecondsBetweenRedraws(2);
         $bar->setFormat("\n%message% %current%/%max% ║%bar%║ %percent:3s%%\n");
         $bar->setMessage(
-            strtr($this->messageTemplate(), [
+            strtr($this->messageTemplate($states), [
                 '%message' => '',
                 '%errorList' => '',
                 '%errors' => 0,
@@ -59,14 +70,14 @@ trait statesBar
                 '%itemsPerHour' => 0,
                 '%etaMinutes' => 0,
                 '%etaHours' => 0,
-                '%itemsLeft' => number_format(0, 0, '.', ','),
+                '%itemsLeft' => number_format(0),
                 '%runtime' => 0,
                 '%label' => $label,
             ])
         );
 
         $bar->start();
-        $this->start();
+        $this->timer()->start();
 
         foreach ($collection as $key => $value) {
             // calculate items processed per X seconds
@@ -76,7 +87,7 @@ trait statesBar
                 // Measurements
                 if ($now >= ($lastMeasurement + $measurementInterval)) {
                     $lastMeasurement = $now;
-                    $runtime = $lastMeasurement - $this->started();
+                    $runtime = $this->timer()->elapsed();
                     $itemsLeft = $bar->getMaxSteps() - $bar->getProgress();
                     $itemsPerSecond = ($itemsLeftLast - $itemsLeft) / $measurementInterval;
                     $itemsPerMinute = $itemsPerSecond * 60;
@@ -89,14 +100,14 @@ trait statesBar
                 $onItem($value, $states, $bar);
 
                 $bar->setMessage(
-                    strtr($this->messageTemplate(), [
-                        '%message' => $states->message(),
-                        '%errorList' => $states->errors()->implode("\n\n"),
+                    strtr($this->messageTemplate($states), [
+                        '%message' => $this->escapeAnsi($states->message()),
+                        '%errorList' => $this->escapeAnsi($states->errors()->implode("\n\n")),
                         '%errors' => $states->errors()->count(),
                         '%skipped' => $states->skipped()->count(),
                         '%created' => $states->created()->count(),
                         '%updated' => $states->updated()->count(),
-                        '%itemsLeft' => number_format($itemsLeft, 0, '.', ','),
+                        '%itemsLeft' => number_format($itemsLeft),
                         '%itemsPerSecond' => ($val = floor($itemsPerSecond)) > 0 ? $val : 0,
                         '%measurementInterval' => ($val = (float)$measurementInterval) > 0 ? $val : 0,
                         '%itemsPerMinute' => ($val = floor($itemsPerMinute)) > 0 ? $val : 0,
@@ -104,15 +115,15 @@ trait statesBar
                         '%etaMinutes' => ($val = round($itemsEtaMinutes)) < 1 ? 'less than 1' : $val,
                         '%etaHours' => ($val = round($itemsEtaHours, 1)) < 1 ? 'less than 1' : $val,
                         '%runtime' => ($val = round($runtime / 60)) < 1 ? 'less than 1' : $val,
-                        '%label' => $label,
+                        '%label' => $this->escapeAnsi($label),
                     ])
                 );
             } catch (Exception $e) {
                 $error = strtr($this->errorTemplate(), [
                     '%idx' => $states->errors()->count() + 1,
-                    '%message' => $states->message(),
-                    '%step' => $states->step(),
-                    '%error' => $e->getMessage(),
+                    '%message' => $this->escapeAnsi($states->message()),
+                    '%step' => $this->escapeAnsi($states->step()),
+                    '%error' => $this->escapeAnsi($e->getMessage()),
                 ]);
 
                 $this->raiseError($error);
@@ -121,13 +132,14 @@ trait statesBar
             $bar->advance();
         }
 
-        $this->stop();
+        $this->timer()->stop();
         $bar->finish();
 
         return $collection;
     }
 
-    protected function step(string $set = null)//: self|string
+    /** Step to be displayed */
+    function step(string $set = null): self|string
     {
         static $step = '';
         if ($set) {
@@ -137,70 +149,59 @@ trait statesBar
         return $step;
     }
 
-    protected function message(string $set = null)//: self|string
+    /** Message to be displayed */
+    function message(string $set = null, ...$args): self|string
     {
         static $message = '';
         if ($set) {
-            $message = $set;
+            $message = $this->sprintf($set, ...$args);
             return $this;
         }
         return $message;
     }
 
-    protected function messageTemplate(): string
+    function messageTemplate($states): string
     {
-        if ($this->option('no-ansi')) {
-            return "\n"
-                . "Last errors:\n"
-                . "%errorList\n\n"
-                . "Errors : %errors | "
-                . "Skipped: %skipped | "
-                . "Created: %created | "
-                . "Updated: %updated | "
-                . "Speed: %itemsPerSecond/s ¦ %itemsPerMinute/m ¦ %itemsPerHourk/h | "
-                . "Time due: %runtimem | "
-                . "Eta: %etaMinutesm ¦ %etaHoursh\n"
-                . "%message\n"
-                . "%label left: %itemsLeft ¦ processed:";
-        } else {
-            return "\n"
+        return $this->escapeAnsi(
+            (($states->errors()->count()) ?
+                "\n"
                 . "\e[31mLast errors: \e[0m\n"
                 . "%errorList \e[0m\n\n"
-                . "\e[31mErrors: \e[91m%errors \e[90m│\e[0m "
-                . "\e[33mSkipped: \e[93m%skipped \e[90m│\e[0m "
-                . "\e[32mCreated: \e[92m%created \e[90m│\e[0m "
-                . "\e[36mUpdated: \e[96m%updated \e[90m│\e[0m "
-                . "\e[34mSpeed: \e[94m%itemsPerSecond\e[34m/s ¦ \e[94m%itemsPerMinute\e[34m/m ¦ \e[94m%itemsPerHour\e[34mk/h \e[90m│\e[0m "
-                . "\e[35mTime due: \e[35m%runtime\e[35mm \e[90m│\e[0m "
-                . "\e[95mEta: \e[95m%etaMinutes\e[95mm ¦ \e[95m%etaHours\e[95mh\e[0m\n"
-                . "%message\n"
-                . "%label left: \e[97m%itemsLeft \e[90m¦\e[0m processed:";
-        }
+                :
+                ""
+            )
+            . "\e[31mErrors: \e[91m%errors \e[90m│\e[0m "
+            . "\e[33mSkipped: \e[93m%skipped \e[90m│\e[0m "
+            . "\e[32mCreated: \e[92m%created \e[90m│\e[0m "
+            . "\e[36mUpdated: \e[96m%updated \e[90m│\e[0m "
+            . "\e[34mSpeed: \e[94m%itemsPerSecond\e[34m/s ¦ \e[94m%itemsPerMinute\e[34m/m ¦ \e[94m%itemsPerHour\e[34mk/h \e[90m│\e[0m "
+            . "\e[35mTime due: \e[35m%runtime\e[35mm \e[90m│\e[0m "
+            . "\e[95mEta: \e[95m%etaMinutes\e[95mm ¦ \e[95m%etaHours\e[95mh\e[0m\n"
+            . "%message\n"
+            . "%label left: \e[97m%itemsLeft \e[90m¦\e[0m processed:"
+        );
     }
 
-    protected function errorTemplate(): string
+    function errorTemplate(): string
     {
-        if ($this->option('no-ansi')) {
-            return "Error #%idx on '%message' in step '%step':\n%error";
-        } else {
-            return "\e[31mError \e[91m#%idx\e[0m on '\e[97m%message\e[0m' in step '\e[97m%step\e[0m':\n%error";
-        }
+        return $this->escapeAnsi(
+            "\e[31mError \e[91m#%idx\e[0m on '\e[97m%message\e[0m' in step '\e[97m%step\e[0m':\n%error"
+        );
     }
 
     /**
-     * @param mixed $set
-     * @return statesBar
+     * Set the key of the current collection item being processed
      */
-    private function setKey($set): self
+    private function setKey(mixed $set): self
     {
         $this->key = $set;
         return $this;
     }
 
     /**
-     * @return mixed
+     * Return the index key of the current processed collection item
      */
-    private function key()//: mixed
+    function key(): mixed
     {
         return $this->key;
     }

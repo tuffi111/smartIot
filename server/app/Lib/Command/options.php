@@ -6,9 +6,15 @@ use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
-trait options{
-    protected function optionDate(string $option, $default = null, string $format = 'Y-m-d')
-    {
+trait options
+{
+    use withConsole;
+
+    function optionDate(
+        string $option,
+        Carbon|callable|null $default = null,
+        string $format = 'Y-m-d'
+    ): Carbon|null {
         $date = $this->optionNormalized($option);
         if (!$date) {
             return $this->resolveDefault($default, $date);
@@ -17,12 +23,12 @@ trait options{
         try {
             return Carbon::createFromFormat($format, $date);
         } catch (Exception $e) {
-            $this->warn(sprintf('Date error for "--%s": "%s" causes: %s', $option, $date, $e->getMessage()));
+            $this->warn(sprintf('Date error for "--%s": "%s" raises: %s', $option, $date, $e->getMessage()));
             return $this->resolveDefault($default, $date);
         }
     }
 
-    protected function optionString(string $option, $default = null)
+    function optionString(string $option, string|callable|null $default = null): string|null
     {
         $value = $this->optionNormalized($option);
 
@@ -33,8 +39,12 @@ trait options{
         return $value;
     }
 
-    protected function optionArray(string $option, $default = [], string $separator = ','): array
-    {
+
+    function optionArray(
+        string $option,
+        array|Collection|callable $default = [],
+        string $separator = ','
+    ): array {
         $value = $this->option($option);
 
         if (!$value || (is_array($value) && !count($value))) {
@@ -46,15 +56,15 @@ trait options{
         return array_filter(explode($separator, preg_replace('/\s+/', $separator, $value)));
     }
 
-    protected function optionCollection(
+    function optionCollection(
         string $option,
-        $default = [],
+        array|Collection|callable $default = [],
         string $separator = ','
     ): Collection {
         return Collection::make($this->optionArray($option, $default, $separator));
     }
 
-    protected function optionBool(string $option, $default = null): bool
+    function optionBool(string $option, bool|callable|null $default = null): bool
     {
         $value = $this->optionNormalized($option);
         if (is_null($value)) {
@@ -63,7 +73,7 @@ trait options{
         return static::isTrue($value);
     }
 
-    protected static function isTrue($value): bool
+    static function isTrue($value): bool
     {
         return ($value === true
             || (int)$value === 1
@@ -74,7 +84,7 @@ trait options{
         );
     }
 
-    private function resolveDefault($default, $data)
+    private function resolveDefault(mixed $default, $data): mixed
     {
         if (is_callable($default)) {
             return $default($data);
@@ -82,7 +92,7 @@ trait options{
         return $default;
     }
 
-    private function optionNormalized(string $option)
+    private function optionNormalized(string $option): ?string
     {
         $value = $this->option($option);
         if (is_null($value)) {
@@ -90,6 +100,4 @@ trait options{
         }
         return trim($value);
     }
-
-
 }
