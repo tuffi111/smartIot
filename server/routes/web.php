@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\App as AppController;
 
@@ -15,10 +16,18 @@ use App\Http\Controllers\App as AppController;
 */
 
 //Route::middleware(Language::class)->group(function () {
-    Route::fallback([AppController::class, 'index']);
+Route::fallback([AppController::class, 'index']);
+
+//Auth::routes();
+Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+Route::post('loginxxx', function (){
+    return 'xxxxxxxxxx';
+});
 
 
-    Route::get('/', function () {
-        return view('index');
-    });
+
+// todo: implement "about:version" route to get deployed app infos
 //}
+
+
+

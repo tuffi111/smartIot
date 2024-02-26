@@ -1,3 +1,9 @@
+<!-- todo: Issue: left drawer expands to top of screen on "devices < pad" (=mobile) devices.
+        This overlaps the header menu and makes drawer closing impossible if left drawer is
+        expanded to/beyond is max width in viewport.
+        -> reduce left drawer top to menu bottom; as in all other views (>mobile = pad/desktop/screen).
+        -> reduce left drawer width to max viewport width - resize-handle-width
+-->
 <template>
     <q-layout view="hHh LpR fFr">
 
@@ -120,15 +126,21 @@
                         <q-item-section>
                             <q-btn icon="light_mode" @click="toggleTheme"/>
                         </q-item-section>
+
                         <q-item-section>
                             <q-btn icon="text_increase" @click="stepFontSize(1)"/>
                         </q-item-section>
+
+                        <q-item-section>
+                            <q-btn @click="setFontSize(defaultFontsize)">1</q-btn>
+                        </q-item-section>
+
                         <q-item-section>
                             <q-btn icon="text_decrease" @click="stepFontSize(-1)"/>
                         </q-item-section>
                     </q-item>
-                    <q-separator/>
 
+                    <q-separator/>
 
                     <q-item clickable v-ripple to="/settings">
                         <q-item-section avatar>
@@ -197,6 +209,7 @@ export default {
         const rightDrawerOpen = ref(false)
         let initialLeftDrawerWidth
         const leftDrawerWidth = ref(300)
+        let defaultFontsize = 11;
 
         if (store.state.themeMode === undefined) {
             q.dark.set("auto")
@@ -205,8 +218,12 @@ export default {
             q.dark.set(store.state.themeMode)
         }
 
+        function getContainerElements(selector = null) {
+            return document.querySelectorAll(selector ?? ".q-page-container")
+        }
+
         onMounted(() => {
-            const list = document.querySelectorAll(".q-page-container")
+            const list = getContainerElements();
             for (let index = 0; index < list.length; ++index) {
                 const element = list[index]
                 if (!store.state.fontsize) {
@@ -214,6 +231,7 @@ export default {
                     let fontsize = parseInt(compStyles.getPropertyValue("font-size").replace(/\D/g, ''));
                     fontsize = (isNaN(fontsize) ? 0 : fontsize)
                     store.state.fontsize = fontsize
+                    defaultFontsize = fontsize
                 }
                 element.style.fontSize = store.state.fontsize + "px"
             }
@@ -232,6 +250,7 @@ export default {
                 rightDrawerOpen.value = !rightDrawerOpen.value
             },
             drawerWidth: leftDrawerWidth,
+            defaultFontsize,
             resizeDrawer(ev) {
                 if (ev.isFirst === true) {
                     initialLeftDrawerWidth = leftDrawerWidth.value
@@ -242,18 +261,20 @@ export default {
                 q.dark.set(!store.state.themeMode)
                 store.state.themeMode = q.dark.isActive
             },
-
             stepFontSize(step = 1) {
-                const list = document.querySelectorAll(".q-page-container"); // Does not match anything
+                this.setFontSize(store.state.fontsize + step)
+            },
+
+            setFontSize(set) {
+                store.state.fontsize = set
+                const list = getContainerElements()
                 for (let index = 0; index < list.length; ++index) {
-                    store.state.fontsize = store.state.fontsize + step
-                    list[index].style.fontSize = store.state.fontsize + "px"
+                    list[index].style.fontSize = set + "px"
                 }
             }
         }
     }
 }
-
 </script>
 
 

@@ -1,9 +1,10 @@
-import {defineConfig} from 'vite'
+import {defineConfig, normalizePath} from 'vite'
 import {viteStaticCopy} from "vite-plugin-static-copy";
 import {fileURLToPath, URL} from 'node:url'
 import {quasar, transformAssetUrls} from "@quasar/vite-plugin";
 import vue from '@vitejs/plugin-vue'
 import laravel from 'laravel-vite-plugin';
+import path from "node:path";
 
 
 export default defineConfig({
@@ -16,7 +17,7 @@ export default defineConfig({
         viteStaticCopy({
             targets: [
                 {
-                    src: 'resources/public/*',
+                    src: normalizePath(path.resolve(__dirname, 'resources/public/*')),
                     dest: '.'
                 }
             ]
@@ -40,11 +41,12 @@ export default defineConfig({
             },
         }),
         quasar({
-            sassVariables: '@/css/quasar.variables.scss',
+            sassVariables: 'resources/css/quasar.variables.scss',
         }),
-
         laravel({
-            input: ['./resources/frontend/src/main.js'],
+            input: [
+                'resources/js/app.js',
+            ],
             buildDirectory: '.',
             refresh: true,
         }),
@@ -56,5 +58,8 @@ export default defineConfig({
             'ziggy': path.resolve('vendor/tightenco/ziggy/dist/index.es'),
             //'ziggyVue': path.resolve('vendor/tightenco/ziggy/dist/vue.es'),
         }
-    }
+    },
+    watch: {
+        ignored: ["**/vendor/**"],
+    },
 })

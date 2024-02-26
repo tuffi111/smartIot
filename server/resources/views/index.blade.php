@@ -17,8 +17,16 @@
     <link rel="icon" type="image/ico" href="{{asset('assets/favicon.ico')}}'">
 </head>
 <body class="antialiased">
-<div id="app"></div>
+<div id="app"><!--
+    while loadings js: display simple predicted html/css outline here (wie wird das in fe-sprech genannt?)
+    will be overwritten by main.js/vue
+--></div>
+<script>
+    var Auth = JSON.parse( '@json($auth)' );
+</script>
+
 {{ Vite::useBuildDirectory('.') }}
-@vite('resources/frontend/src/main.js')
+
+@vite('resources/js/app.js')
 </body>
 </html>
