@@ -1,10 +1,17 @@
 import {Model} from "@app/models/Model.js";
 
 export class LoginModel extends Model {
-    constructor(data = {}) {
-        super('LoginData', Object.assign({
+    constructor(data = {},name="LoginData") {
+        super(name, Object.assign({
             email: '',
-            password: ''
+            password: '',
         }, data));
+    }
+
+    validations() {
+        return {
+            email: [],
+            password:  [ val => val && val.length > 0 || 'Please type something']
+        }
     }
 }

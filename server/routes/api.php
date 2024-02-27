@@ -18,20 +18,21 @@ use Illuminate\Support\Facades\Route;
 */
 
 
+//Auth::routes();
+
 Route::middleware([
     Cors::class,
     ForceJsonResponse::class,
     //Language::class,
 ])->group(function () {
-    Route::post('/register', [ApiAuthController::class, 'register'])->name('register.api');
-    Route::post('/login', [ApiAuthController::class, 'login'])->name('login.api');
+    //Route::put('login', [ApiAuthController::class, 'register'])->name('auth.api.register');
 });
 
 
-Route::middleware('auth:api')->group(function () {
-    Route::post('/logout', [ApiAuthController::class, 'logout'])->name('logout.api');
-
-    Route::get('/user/get', [UserController::class, 'get']);
+Route::middleware(['auth:api','web'])->group(function () {
+    Route::get('logout', [ApiAuthController::class, 'logout'])->name('auth.api.logout');
+    Route::get('permissions', [ApiAuthController::class, 'permissions'])->name('auth.api.permissions');
+    Route::get('user/get', [UserController::class, 'get']);
 });
 
 

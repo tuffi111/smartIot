@@ -4,14 +4,20 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\UnauthorizedException;
+use Laravel\Passport\Passport;
 
 class ApiAuthController extends Controller
 {
-    public function register(Request $request)
+
+    function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -32,41 +38,16 @@ class ApiAuthController extends Controller
         return response($response, 200);
     }
 
-    public function login(Request $request)
+    function logout(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:6',
-        ]);
-        if ($validator->fails()) {
-            return response(['errors' => $validator->errors()->all()], 422);
-        }
-        $user = User::where('email', $request->email)->first();
-        if ($user) {
-            if (Hash::check($request->password, $user->password)) {
-                dd( $user->token() );
-                dd( $user->tokens()->get()->toArray() );
-
-                $token = $user->createToken('Laravel Password Grant Client')->accessToken;
-                $response = ['token' => $token];
-                return response($response, 200);
-            } else {
-                $response = ["message" => "Password mismatch"];
-                return response($response, 422);
-            }
-        } else {
-            $response = ["message" => 'User does not exist'];
-            return response($response, 422);
-        }
+        Auth::user()->token()->revoke();
+        Auth::guard('web')->logout();
+        return new JsonResponse(null, 200);
     }
 
-    public function logout(Request $request)
-    {
-        dd( __LINE__);
-        $token = $request->user()->token();
-        $token->revoke();
-        $response = ['message' => 'You have been successfully logged out!'];
-        return response($response, 200);
-    }
 
+    function permissions(Request $request)
+    {
+        return new JsonResponse(Auth::user()->permissions()->get());
+    }
 }

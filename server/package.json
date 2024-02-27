@@ -10,6 +10,7 @@
         "✗   Clean caches": "vagrant ssh -c \"cd code && bash ./clean-caches.sh\"",
         "✗   Clean all": "vagrant ssh -c \"cd code && bash ./clean.sh\"",
         "-- FRONTEND ----------": "",
+        "⟳   fe-dev-build-watch": "vagrant ssh -c \"cd code && npm run vite-dev-build-watch\"",
         "⟳   fe-build-watch": "vagrant ssh -c \"cd code && npm run vite-build-watch\"",
         "✗   fe-build": "vagrant ssh -c \"cd code && npm run vite-build\"",
         "ⓘ   fe-npm-install": "vagrant ssh -c \"cd code && npm i\"",

@@ -16,18 +16,16 @@ use App\Http\Controllers\App as AppController;
 */
 
 //Route::middleware(Language::class)->group(function () {
-Route::fallback([AppController::class, 'index']);
+Route::fallback([AppController::class, 'index'])->name('index');
 
 //Auth::routes();
-Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
-Route::post('loginxxx', function (){
-    return 'xxxxxxxxxx';
-});
+Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('auth.login');
+Route::put('login', [App\Http\Controllers\Auth\RegisterController::class, 'register'])->name('auth.register');
 
-
+Route::get('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('auth.logout');
 
 // todo: implement "about:version" route to get deployed app infos
-//}
+
 
 
 

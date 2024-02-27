@@ -49,6 +49,7 @@ export default defineConfig({
             ],
             buildDirectory: '.',
             refresh: true,
+            //valetTls: 'domain.test',
         }),
     ],
     resolve: {
@@ -61,5 +62,9 @@ export default defineConfig({
     },
     watch: {
         ignored: ["**/vendor/**"],
+    },
+    server: {
+        //https: true,
+        //host: 'domain2.test',
     },
 })

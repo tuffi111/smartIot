@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+
 class LoginController extends Controller
 {
     /*
@@ -21,20 +22,36 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers{
-        sendLoginResponse as protected sendLoginResponseBase;
+    use AuthenticatesUsers {
+        logout as logoutBase;
     }
 
-
-    protected function sendLoginResponse(Request $request)
+    protected function authenticated(Request $request, $user)
     {
-        $this->sendLoginResponseBase($request);
-
-        Auth::user()->tokens()->delete();
-        $apiToken = Auth::user()->createToken('Laravel Password Grant Client')->accessToken;
-
+        //todo: do nit revoke to much
+        $user->tokens()->delete();
         return new JsonResponse([
-            'token' => $apiToken,
+            'token' => $user->createToken('Laravel Password Grant Client')->accessToken,
+            'permissions' => $user->permissions()->get(),
         ], 200);
     }
+
+
+    public function logout(Request $request)
+    {
+        if ($request->user()) {
+            //todo: do nit revoke to much
+            $request->user()->tokens()->delete();
+        }
+        return $this->logoutBase($request);
+    }
+
+    protected function loggedOut(Request $request)
+    {
+
+        return redirect('/');
+        return new JsonResponse([
+        ], 200);
+    }
+
 }

@@ -1,6 +1,4 @@
-import userAuth from '@app/auth/user'
-import adminAuth from '@app/auth/admin'
-import anyAuth from '@app/auth/any'
+import {isAuth} from '@app/auth'
 
 
 const routes = [
@@ -9,7 +7,6 @@ const routes = [
         component: () => import("@/views/Home.vue"),
         children: [
             {path: '', component: () => import("@/views/home/Index.vue")},
-            {path: '/logout', component: () => import("@/views/Logout.vue")},
             {path: '/examples', component: () => import("@/views/home/Examples.vue")},
             {
                 path: '/scenarios',
@@ -24,16 +21,15 @@ const routes = [
                 children: [
                     {path: '', component: () => import("@/views/devices/Index.vue")},
                 ],
-               meta: {auth: [adminAuth, userAuth]}
+               meta: {auth: isAuth}
             },
             {path: '/settings', component: () => import("@/views/Settings.vue")},
         ],
-        meta: {auth: [userAuth]}
+        meta: {auth: isAuth}
     },
 
     {path: '/register', component: () => import("@/views/Register.vue")},
-    {path: '/login', component: () => import("@/views/Login.vue"), meta: {auth: [anyAuth]}},
-    //{path: '/login', component: () => import("@/views/Login.vue")},
+    {path: '/login', component: () => import("@/views/Login.vue")},
     {path: '/about', component: () => import("@/views/About.vue")},
 
 
