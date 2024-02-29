@@ -4,6 +4,127 @@
         -> reduce left drawer top to menu bottom; as in all other views (>mobile = pad/desktop/screen).
         -> reduce left drawer width to max viewport width - resize-handle-width
 -->
+<script>
+import {useSlots, ref, onBeforeMount, onMounted} from 'vue'
+import {useQuasar, setCssVar, getCssVar} from "quasar";
+import {logout} from "@app/auth.js";
+import {useBrowserSettings} from "@/services/browserSettings.js";
+import {Model} from "@app/models/Model.js";
+
+export default {
+    methods: {logout},
+    setup() {
+        const slots = useSlots()
+        const q = useQuasar();
+        const leftDrawerOpen = ref(false)
+        const rightDrawerOpen = ref(false)
+        let initialLeftDrawerWidth
+        const leftDrawerWidth = ref(300)
+        let defaultFontsize = 11
+        const browserSettings = useBrowserSettings()
+
+        browserSettings.bind(Model.EVENT_CHANGED, (data) => {
+            console.log('MODEL DATA CHANGED-0', data)
+            setTheme(data.themeMode);
+            applyFontSize(parseFloat(data.fontsize));
+        })
+
+        const getFontSize = () => {
+            return parseFloat(browserSettings.get('fontsize'))
+        }
+
+        const stepFontSize = (step = 1) => {
+            setFontSize(getFontSize() + step)
+        }
+
+
+        const setFontSize = (set) => {
+            set = parseFloat(set)
+            browserSettings.set('fontsize', set)
+            applyFontSize(set)
+        }
+
+        const applyFontSize = (size) => {
+            const list = getContainerElements()
+            for (let index = 0; index < list.length; ++index) {
+                list[index].style.fontSize = size + "px"
+            }
+        }
+
+        const toggleTheme = () => {
+            setTheme(!browserSettings.get('themeMode'))
+            browserSettings.set('themeMode', q.dark.isActive)
+        }
+
+        const setTheme = (set) => {
+            if (set === undefined) {
+                q.dark.set("auto")
+            } else {
+                q.dark.set(set)
+            }
+        }
+
+
+        const getContainerElements = (selector = null) => {
+            return document.querySelectorAll(selector ?? ".q-page-container")
+        }
+
+        const toggleLeftDrawer = () => {
+            leftDrawerOpen.value = !leftDrawerOpen.value
+        }
+
+        const toggleRightDrawer = () => {
+            rightDrawerOpen.value = !rightDrawerOpen.value
+        }
+
+        const resizeDrawer = (ev) => {
+            if (ev.isFirst === true) {
+                initialLeftDrawerWidth = leftDrawerWidth.value
+            }
+            leftDrawerWidth.value = initialLeftDrawerWidth + ev.offset.x
+        }
+
+        const sendLogout = async () => {
+            console.log('Send logout req');
+            let r = logout()
+                .then((data) => {
+                    console.info('Logout successful');
+                })
+                .catch((error) => {
+                    console.error('Logout error', error);
+                })
+
+            console.log('Send logout req done', r);
+
+            /**/
+        }
+
+        onMounted(() => {
+            setTheme(browserSettings.get('themeMode'));
+            applyFontSize(getFontSize())
+        })
+
+        return {
+            isAuth: true,
+            drawerWidth: leftDrawerWidth,
+            leftDrawerOpen,
+            rightDrawerOpen,
+            slots,
+            defaultFontsize,
+            getFontSize,
+            stepFontSize,
+            setFontSize,
+            toggleTheme,
+            resizeDrawer,
+            sendLogout,
+            toggleLeftDrawer,
+            toggleRightDrawer
+        }
+    }
+}
+</script>
+
+
 <template>
     <q-layout view="hHh LpR fFr">
 
@@ -128,7 +249,11 @@
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn icon="text_increase" @click="stepFontSize(1)"/>
+                            <q-btn icon="text_decrease" @click="stepFontSize(-1)"/>
+                        </q-item-section>
+
+                        <q-item-section>
+                            {{ getFontSize() }}
                         </q-item-section>
 
                         <q-item-section>
@@ -136,8 +261,10 @@
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn icon="text_decrease" @click="stepFontSize(-1)"/>
+                            <q-btn icon="text_increase" @click="stepFontSize(1)"/>
                         </q-item-section>
+
+
                     </q-item>
 
                     <q-separator/>
@@ -162,7 +289,8 @@
 
                     <q-separator></q-separator>
 
-                    <q-item clickable v-ripple>
+                    <q-item clickable v-ripple
+                            @click="sendLogout">
                         <q-item-section avatar>
                             <q-icon name="power_settings_new"/>
                         </q-item-section>
@@ -193,89 +321,6 @@
 
     </q-layout>
 </template>
-
-<script>
-import {useSlots, ref, onBeforeMount, onMounted} from 'vue'
-import {useQuasar, setCssVar, getCssVar} from "quasar";
-import {useStore} from "vuex";
-
-
-export default {
-    setup() {
-        const slots = useSlots()
-        const q = useQuasar();
-        const store = useStore();
-        const leftDrawerOpen = ref(false)
-        const rightDrawerOpen = ref(false)
-        let initialLeftDrawerWidth
-        const leftDrawerWidth = ref(300)
-        let defaultFontsize = 11;
-
-        if (store.state.themeMode === undefined) {
-            q.dark.set("auto")
-            store.state.themeMode = q.dark.isActive
-        } else {
-            q.dark.set(store.state.themeMode)
-        }
-
-        function getContainerElements(selector = null) {
-            return document.querySelectorAll(selector ?? ".q-page-container")
-        }
-
-        onMounted(() => {
-            const list = getContainerElements();
-            for (let index = 0; index < list.length; ++index) {
-                const element = list[index]
-                if (!store.state.fontsize) {
-                    const compStyles = window.getComputedStyle(element)
-                    let fontsize = parseInt(compStyles.getPropertyValue("font-size").replace(/\D/g, ''));
-                    fontsize = (isNaN(fontsize) ? 0 : fontsize)
-                    store.state.fontsize = fontsize
-                    defaultFontsize = fontsize
-                }
-                element.style.fontSize = store.state.fontsize + "px"
-            }
-        })
-
-
-        return {
-            isAuth: true,
-            leftDrawerOpen,
-            toggleLeftDrawer() {
-                leftDrawerOpen.value = !leftDrawerOpen.value
-            },
-            rightDrawerOpen,
-            slots,
-            toggleRightDrawer() {
-                rightDrawerOpen.value = !rightDrawerOpen.value
-            },
-            drawerWidth: leftDrawerWidth,
-            defaultFontsize,
-            resizeDrawer(ev) {
-                if (ev.isFirst === true) {
-                    initialLeftDrawerWidth = leftDrawerWidth.value
-                }
-                leftDrawerWidth.value = initialLeftDrawerWidth + ev.offset.x
-            },
-            toggleTheme() {
-                q.dark.set(!store.state.themeMode)
-                store.state.themeMode = q.dark.isActive
-            },
-            stepFontSize(step = 1) {
-                this.setFontSize(store.state.fontsize + step)
-            },
-
-            setFontSize(set) {
-                store.state.fontsize = set
-                const list = getContainerElements()
-                for (let index = 0; index < list.length; ++index) {
-                    list[index].style.fontSize = set + "px"
-                }
-            }
-        }
-    }
-}
-</script>
 
 
 <style lang="sass">

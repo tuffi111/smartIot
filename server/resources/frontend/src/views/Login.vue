@@ -9,49 +9,26 @@ import {useApi, useHttp} from '@app/requests.js'
 import {LoginModel} from "@/models/LoginModel.js";
 import {Errors} from "@app/errors.js";
 import {ionEyeOffOutline, ionEyeOutline, ionFingerPrint, ionMailOutline} from "@quasar/extras/ionicons-v7";
-import { useRouter } from 'vue-router';
+import {useRouter} from 'vue-router';
+import {login} from "@app/auth.js";
 
 const FormData = new LoginModel()
 const router = useRouter()
 const store = useStore();
 const http = useHttp();
 const api = useApi();
+const permissions = reactive([]);
+const showPass = ref(false);
+const errors = new Errors(FormData);
 
-let permissions = reactive([]);
-let showPass = ref(false);
-let errors = new Errors(FormData);
-
-onBeforeMount(() => {
-
-});
-
-const login = () => {
-    http('/login', {
-        method: "POST",
-        data: FormData.get(),
-    })
-        .then((response) => {
-            //console.error('API: RESPONSE', response)
-            if (response.status === 200) {
-                return response.data;
-            } else {
-                //console.error('ERRROR', response)
-                //todo: notetify('Login failed', response)
-            }
-
-        })
-        .then((data) => {
-            localStorage.setItem('token', data.token)
+const sendLogin = () => {
+    login(FormData.get(),
+        (data) => {
             router.push('/')
-        })
-        .catch((error) => {
-            //console.error('ERRROR', error.response.data.errors)
+        },
+        (error) => {
             errors.set(error.response.data.errors)
         })
-}
-
-function resetForm() {
-    Object.assign(form, initialState);
 }
 
 const logout = () => {
@@ -106,6 +83,7 @@ const getPermissions = () => {
                                  :error="errors.has('email')"
                                  :error-message="errors.get('email')"
                                  :rules="FormData.validation('email')"
+                                 class="q-pt-lg"
                         >
                             <template v-slot:prepend>
                                 <q-icon :name="ionMailOutline"/>
@@ -119,13 +97,16 @@ const getPermissions = () => {
                                  :error="errors.has('password')"
                                  :error-message="errors.get('password')"
                                  :rules="FormData.validation('password')"
+                                 class="q-pt-lg"
                         >
                             <template v-slot:prepend>
                                 <q-icon :name="ionFingerPrint"/>
                             </template>
                             <template v-slot:append>
-                                <q-icon v-if="!showPass" title="Show password" :name="ionEyeOutline" @click="showPass=!showPass"/>
-                                <q-icon v-if="showPass" title="Hide password" :name="ionEyeOffOutline" @click="showPass=!showPass"/>
+                                <q-icon v-if="!showPass" title="Show password" :name="ionEyeOutline"
+                                        @click="showPass=!showPass"/>
+                                <q-icon v-if="showPass" title="Hide password" :name="ionEyeOffOutline"
+                                        @click="showPass=!showPass"/>
                             </template>
                         </q-input>
 
@@ -134,8 +115,8 @@ const getPermissions = () => {
             </q-card-section>
 
 
-            <q-card-actions align="around" class="q-mt-sm">
-                <q-btn color="primary" @click="login">Login</q-btn>
+            <q-card-actions align="around" class="q-pt-lg">
+                <q-btn color="primary" @click="sendLogin">Login</q-btn>
                 <router-link class="q-btn q-btn--flat cursor-pointer" to="/register">Sign-Up</router-link>
                 <q-btn flat @click="logout">Logout</q-btn>
                 <q-btn flat @click="getPermissions">Permissions</q-btn>
