@@ -24,7 +24,6 @@ export default {
         const browserSettings = useBrowserSettings()
 
         browserSettings.bind(Model.EVENT_CHANGED, (data) => {
-            console.log('MODEL DATA CHANGED-0', data)
             setTheme(data.themeMode);
             applyFontSize(parseFloat(data.fontsize));
         })

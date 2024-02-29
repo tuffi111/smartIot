@@ -1,57 +1,31 @@
 <script setup>
 import Default from "@/layouts/Default.vue";
-import {useSessionModel,useBrowserSettings} from "@/services/browserSettings.js";
+import {useSessionModel, useBrowserSettings, useLocalModel, useCookieModel} from "@/services/browserSettings.js";
 import {} from "@/services/browserSettings.js";
 import {MyVueXModel} from "@/models/MyVueXModel.js";
 import {useStore} from "vuex";
+import {Model} from "@app/models/Model.js";
 
-
-/*
-class TempModel extends Model //LocalModel ApiModel SocketModel
-{
-    name() {
-        return 'TempModel'
-    }
-}
-
-
-class ApiModel extends Model // SocketModel
-{
-    name() {
-        return 'ApiModel'
-    }
-}
-
-
-class SocketModel extends Model // ApiModel
-{
-    name() {
-        return 'SocketModel'
-    }
-}
-
-
-/*
-const tempForm = new TempModel()
-const localForm = new LocalModel()
-const apiForm = new ApiModel()
-const socketForm = new SocketModel()
-
-console.log('tempForm', tempForm.name(), tempForm.data());
-console.log('localForm', localForm.name(), localForm.data());
-console.log('apiForm', apiForm.name(), apiForm.data());
-console.log('socketForm', socketForm.name(), socketForm.data());
-/**/
-
-const browserSettings = useBrowserSettings()
+const localModel = useLocalModel()
 const sessionModel = useSessionModel()
+const cookieModel = useCookieModel()
 const vuexModel = new MyVueXModel();
 const store = useStore()
+const model = new Model({
+    theme: 'theme-name-333',
+    fontsize: 33,
+    address: {street: '', zip: '', city: ''},
+    tags: ['tag-7','tag-8','tag-9'],
+    time: '11:00:00'
+})
 
-console.log('MODELS: browserSettings data', browserSettings.data());
+
+console.log('MODELS: cookieModel data', cookieModel.data());
+console.log('MODELS: localModel data', localModel.data());
 console.log('MODELS: sessionModel data', sessionModel.data());
 console.log('MODELS: vuexModel data', vuexModel.data());
-//console.log('VUEX: store', store);
+console.log('MODELS: model data', model.data());
+console.log('VUEX: store', store);
 
 
 </script>
@@ -64,19 +38,30 @@ console.log('MODELS: vuexModel data', vuexModel.data());
 
         Settings
 
-        Devices
+
 
         <hr>
-        <h4>BrowserSettings</h4>
-        {{ browserSettings.data() }}
+        <h4>CookieModel</h4>
+        {{ cookieModel.data() }}
         <br>
-        <input v-model="browserSettings.data().fontsize">
+        <input v-model="cookieModel.data().fontsize">
         <br>
-        <input v-model="browserSettings.data().address.street">
+        <input v-model="cookieModel.data().address.street">
         <br>
-        <input v-model="browserSettings.data().address.city">
+        <input v-model="cookieModel.data().address.city">
         <br>
 
+
+        <hr>
+        <h4>LocalModel</h4>
+        {{ localModel.data() }}
+        <br>
+        <input v-model="localModel.data().fontsize">
+        <br>
+        <input v-model="localModel.data().address.street">
+        <br>
+        <input v-model="localModel.data().address.city">
+        <br>
 
         <hr>
         <h4>SessionModel</h4>
@@ -100,6 +85,22 @@ console.log('MODELS: vuexModel data', vuexModel.data());
         <br>
         <input v-model="vuexModel.data().address.city">
         <br>
+        {{ store.state }}
+
+
+        <hr>
+        <h4>Model</h4>
+        {{ model.data() }}
+        <br>
+        <input v-model="model.data().fontsize">
+        <br>
+        <input v-model="model.data().address.street">
+        <br>
+        <input v-model="model.data().address.city">
+        <br>
+
+
+        <hr>
         {{ store.state }}
 
 

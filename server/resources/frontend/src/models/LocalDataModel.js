@@ -1,12 +1,12 @@
 import {LocalModel} from "@app/models/LocalModel.js";
 
 
-export class BrowserSettingsModel extends LocalModel {
+export class LocalDataModel extends LocalModel {
 
     constructor(data = {}) {
         super(Object.assign({
-            theme: 'theme-name-AAAA',
-            fontsize: 11,
+            theme: 'theme-name-BBBB',
+            fontsize: 33,
             address: {street: '', zip: '', city: ''},
             tags: ['tag-1','tag-2','tag-3'],
             time: '22:00:00'
@@ -15,7 +15,7 @@ export class BrowserSettingsModel extends LocalModel {
     }/**/
 
     name(){
-        return "BrowserSettings"
+        return "LocalData"
     }
 
     validations() {
