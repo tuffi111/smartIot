@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\ApiAuthController;
+use App\Http\Controllers\Api\ModelController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\Cors;
 use App\Http\Middleware\ForceJsonResponse;
@@ -29,10 +30,17 @@ Route::middleware([
 });
 
 
-Route::middleware(['auth:api','web'])->group(function () {
+Route::middleware(['auth:api', 'web'])->group(function () {
     Route::get('logout', [ApiAuthController::class, 'logout'])->name('auth.api.logout');
     Route::get('permissions', [ApiAuthController::class, 'permissions'])->name('auth.api.permissions');
     Route::get('user/get', [UserController::class, 'get']);
+});
+
+
+
+Route::prefix('models')->group(function () {
+    Route::get('{model}', [ModelController::class, 'fetch']);
+    Route::post('{model}', [ModelController::class, 'update']);
 });
 
 

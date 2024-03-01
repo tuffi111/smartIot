@@ -5,11 +5,12 @@ export class CookieDataModel extends CookieModel {
 
     constructor(data = {}) {
         super(Object.assign({
-            theme: 'theme-name-BBBB',
-            fontsize: 33,
-            address: {street: '', zip: '', city: ''},
-            tags: ['tag-1','tag-2','tag-3'],
-            time: '22:00:00'
+            theme: 'COOKIE-theme',
+            type: 1,
+            address: {street: 'aaa', zip: 'aaa111', city: 'aaa111aaa'},
+            tags: {'tag-1':'tag-1', 'tag-11':'tag-11', 'tag-111':'tag-111'},
+            rights: ['read','write'],
+            time: '11:00:00'
         }, data), name);
 
     }/**/

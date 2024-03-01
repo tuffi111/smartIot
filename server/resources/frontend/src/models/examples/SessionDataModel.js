@@ -5,16 +5,17 @@ export class SessionDataModel extends SessionModel {
 
     constructor(data = {}) {
         super(Object.assign({
-            theme: 'theme-name-444',
-            fontsize: 22,
-            address: {street: '', zip: '', city: ''},
-            tags: ['tag-4','tag-5','tag-6'],
-            time: '11:00:00'
+            theme: 'SessionModel-theme',
+            type: 6,
+            address: {street: 'fff', zip: 'fff666', city: 'fff666fff'},
+            tags: {'tag-6':'tag-6', 'tag-66':'tag-66', 'tag-666':'tag-666'},
+            rights: ['read','write'],
+            time: '16:00:00'
         }, data), name);
 
     }/**/
 
-    name(){
+    name() {
         return "SessionData"
     }
 
