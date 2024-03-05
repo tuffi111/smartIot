@@ -1,17 +1,28 @@
 import {Model} from "@app/models/Model.js";
+import {email, minMaxLength, required} from "@app/rules.js";
 
 export class LoginModel extends Model {
-    constructor(data = {},name="LoginData") {
-        super(name, Object.assign({
+    name(){
+        return 'LoginData'
+    }
+    model(){
+        return {
             email: '',
             password: '',
-        }, data));
+        }
     }
 
     validations() {
         return {
-            email: [],
-            password:  [ val => val && val.length > 0 || 'Please type something']
+            email: [
+                required(),
+                email(),
+                minMaxLength(3, 255),
+            ],
+            password: [
+                required(),
+            ]
         }
     }
+
 }

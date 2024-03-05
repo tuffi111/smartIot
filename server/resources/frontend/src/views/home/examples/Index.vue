@@ -1,5 +1,5 @@
 <script setup>
-import Default from "@/layouts/Default.vue";
+import 'vue-json-pretty/lib/styles.css';
 import VueJsonPretty from "vue-json-pretty";
 import ModelView from "@/components/ModelView.vue";
 import {useStore} from "vuex";
@@ -55,7 +55,7 @@ onBeforeMount(() => {
     <br>
     Address.City: <input v-model="basicModel.data().address.city">
     <br>
-    <vue-json-pretty :data="basicModel.data()"/>
+    <vue-json-pretty :data="basicModel.data()" :deep="1" />
 
 
     <h4>Cookie Model</h4>
@@ -71,31 +71,31 @@ onBeforeMount(() => {
             <br>
             Address.City: <input v-model="data.address.city">
             <br>
-            <vue-json-pretty :data="data"/>
+            <vue-json-pretty :data="data" class="collapsed" :deep="1"/>
         </template>
     </model-view>
-    <vue-json-pretty :data="cookieModel.data()"/>
+    <vue-json-pretty :data="cookieModel.data()" :deep="0"/>
 
     <hr>
     <h4>LocalStorage Model</h4>
     <model-component-example :model="localModel"></model-component-example>
-    <vue-json-pretty :data="localModel.data()"/>
+    <vue-json-pretty :data="localModel.data()" :deep="1"/>
 
     <hr>
     <h4>SessionStorage Model</h4>
     <model-component-example :model="sessionModel"></model-component-example>
-    <vue-json-pretty :data="sessionModel.data()"/>
+    <vue-json-pretty :data="sessionModel.data()" :deep="1"/>
 
     <hr>
     <h4>Api Model</h4>
     <model-component-example :model="apiModel"></model-component-example>
     <q-btn @click="apiModel.update()">Update</q-btn><q-btn @click="apiModel.fetch()">Fetch</q-btn>
-    <vue-json-pretty :data="apiModel.data()"/><hr>
+    <vue-json-pretty :data="apiModel.data()" :deep="1"/><hr>
 
     <hr>
     <h4>Vuex Store Model</h4>
     <model-component-example :model="vuexModel"></model-component-example>
-    <vue-json-pretty :data="vuexModel.data()"/><hr>
-    Global vuex store state: <vue-json-pretty :data="store.state"/><hr>
+    <vue-json-pretty :data="vuexModel.data()" :deep="0"/><hr>
+    Global vuex store state: <vue-json-pretty :data="store.state" :deep="3"/><hr>
 
 </template>

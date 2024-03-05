@@ -70,8 +70,9 @@ export default ({mode}) => {
             //host: 'domain2.test',
             hmr: {
                 //host: process.env.VITE_APP_IP,
-                //host: "127.0.0.1",
-                host: "localhost",
+                host: "127.0.0.1",
+                //host: "192.168.56.56",
+                //host: "localhost",
             }
         }
     })
