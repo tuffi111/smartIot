@@ -6,13 +6,65 @@
 -->
 <script>
 import {useSlots, ref, onBeforeMount, onMounted} from 'vue'
-import {useQuasar, setCssVar, getCssVar} from "quasar";
+import {useQuasar} from "quasar";
 import {logout} from "@app/auth.js";
 import {useBrowserSettings} from "@/services/browserSettings.js";
 import {Model} from "@app/models/Model.js";
+import {
+    ionAddCircleOutline, ionAppsOutline, ionContrastOutline, ionHardwareChipOutline,
+    ionHomeOutline, ionInformationCircleOutline,
+    ionMailOutline, ionMenuOutline, ionMoonOutline, ionPowerOutline,
+    ionRefreshCircleOutline,
+    ionRemoveCircleOutline, ionSearchCircleOutline, ionSettingsOutline, ionWarningOutline
+} from "@quasar/extras/ionicons-v7";
 
 export default {
-    methods: {logout},
+    methods: {
+        ionAppsOutline() {
+            return ionAppsOutline
+        },
+        ionWarningOutline() {
+            return ionWarningOutline
+        },
+        ionMenuOutline() {
+            return ionMenuOutline
+        },
+        ionPowerOutline() {
+            return ionPowerOutline
+        },
+        ionInformationCircleOutline() {
+            return ionInformationCircleOutline
+        },
+        ionSearchCircleOutline() {
+            return ionSearchCircleOutline
+        },
+        ionSettingsOutline() {
+            return ionSettingsOutline
+        },
+        ionHardwareChipOutline() {
+            return ionHardwareChipOutline
+        },
+        ionContrastOutline() {
+            return ionContrastOutline
+        },
+        ionMoonOutline() {
+            return ionMoonOutline
+        },
+        ionRefreshCircleOutline() {
+            return ionRefreshCircleOutline
+        },
+        ionRemoveCircleOutline() {
+            return ionRemoveCircleOutline
+        },
+        ionAddCircleOutline() {
+            return ionAddCircleOutline
+        },
+        ionMailOutline() {
+            return ionMailOutline
+        },
+        ionHomeOutline() {
+            return ionHomeOutline
+        }, logout},
     setup() {
         const slots = useSlots()
         const q = useQuasar();
@@ -131,10 +183,10 @@ export default {
             <q-toolbar>
 
                 <q-btn flat to="/">
-                    <q-avatar icon="home" size="26px"/>
+                    <q-avatar :icon="ionHomeOutline()" size="26px"/>
                 </q-btn>
 
-                <q-btn v-if="slots.sidebar" dense flat round auto-close icon="menu" @click="toggleLeftDrawer"/>
+                <q-btn v-if="slots.sidebar" dense flat round auto-close :icon="ionMenuOutline()" @click="toggleLeftDrawer"/>
 
                 <div v-if="slots.menu">
                     <slot name="menu"/>
@@ -146,7 +198,7 @@ export default {
                            class="q-ma-lg"
                            style="margin-left: 0;margin-top: 0;margin-bottom: 0;"
                     >
-                        <q-avatar icon="email" size="26px">
+                        <q-avatar :icon="ionMailOutline()" size="26px">
                             <q-badge color="red" floating transparent>
                                 3
                             </q-badge>
@@ -165,7 +217,7 @@ export default {
                                 </q-item-label>
                                 <q-item v-for="n in 3" :key="`x.${n}`" clickable v-close-popup tabindex="0" class="">
                                     <q-item-section avatar>
-                                        <q-avatar icon="warning" color="warning"/>
+                                        <q-avatar :icon="ionWarningOutline()" color="warning"/>
                                     </q-item-section>
                                     <q-item-section>
                                         <q-item-label>
@@ -230,7 +282,7 @@ export default {
                 <q-list padding>
                     <q-item>
                         <q-item-section avatar>
-                            <q-avatar size="38px">
+                            <q-avatar size="38px" title="User avatar">
                                 <img src="../assets/avatar4.jpg" alt="Avatar">
                             </q-avatar>
                         </q-item-section>
@@ -244,23 +296,19 @@ export default {
 
                     <q-item>
                         <q-item-section>
-                            <q-btn icon="light_mode" @click="toggleTheme"/>
+                            <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline()" @click="toggleTheme"/>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn icon="text_decrease" @click="stepFontSize(-1)"/>
+                            <q-btn title="Decrease fontsize" :icon="ionRemoveCircleOutline()" @click="stepFontSize(-1)"/>
                         </q-item-section>
 
                         <q-item-section>
-                            {{ getFontSize() }}
+                            <q-btn title="Reset fontsize" :icon="ionRefreshCircleOutline()" @click="setFontSize(defaultFontsize)"></q-btn>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn @click="setFontSize(defaultFontsize)">1</q-btn>
-                        </q-item-section>
-
-                        <q-item-section>
-                            <q-btn icon="text_increase" @click="stepFontSize(1)"/>
+                            <q-btn title="Increase fontsize" :icon="ionAddCircleOutline()" @click="stepFontSize(1)"/>
                         </q-item-section>
 
 
@@ -270,7 +318,7 @@ export default {
 
                     <q-item clickable v-ripple to="/settings">
                         <q-item-section avatar>
-                            <q-icon name="settings"/>
+                            <q-icon title="Settings" :name="ionSettingsOutline()"/>
                         </q-item-section>
                         <q-item-section>
                             Settings
@@ -279,7 +327,7 @@ export default {
 
                     <q-item clickable v-ripple to="/about">
                         <q-item-section avatar>
-                            <q-icon name="info"/>
+                            <q-icon title="About" :name="ionInformationCircleOutline()"/>
                         </q-item-section>
                         <q-item-section>
                             About
@@ -291,7 +339,7 @@ export default {
                     <q-item clickable v-ripple
                             @click="sendLogout">
                         <q-item-section avatar>
-                            <q-icon name="power_settings_new"/>
+                            <q-icon title="Logout" :name="ionPowerOutline()"/>
                         </q-item-section>
 
                         <q-item-section>
@@ -312,9 +360,9 @@ export default {
         <!-- FOOTER-->
         <q-footer elevated class="bg-grey-10 text-white">
             <q-tabs align="center" stretch>
-                <q-route-tab to="/devices" label="Devices" icon="devices"/>
-                <q-route-tab to="/examples" label="Examples" icon="home"/>
-                <q-route-tab to="/scenarios" label="Scenarios" icon="settings"/>
+                <q-route-tab to="/devices" label="Devices" :icon="ionHardwareChipOutline()"/>
+                <q-route-tab to="/examples" label="Examples" :icon="ionSearchCircleOutline()"/>
+                <q-route-tab to="/scenarios" label="Scenarios" :icon="ionAppsOutline()"/>
             </q-tabs>
         </q-footer>
 

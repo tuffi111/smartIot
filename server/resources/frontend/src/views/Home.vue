@@ -1,5 +1,11 @@
 <script setup>
 import Default from "@/layouts/Default.vue";
+import {
+    ionChevronDownOutline,
+    ionDocumentOutline,
+    ionFolderOutline,
+    ionHelpCircleOutline
+} from "@quasar/extras/ionicons-v7";
 </script>
 
 <template>
@@ -11,28 +17,28 @@ import Default from "@/layouts/Default.vue";
                 <q-item-label header>Folders</q-item-label>
                 <q-item v-for="n in 3" :key="`x.${n}`" clickable v-close-popup tabindex="0">
                     <q-item-section avatar>
-                        <q-avatar icon="folder" color="secondary" text-color="white"/>
+                        <q-avatar :icon="ionFolderOutline" color="secondary" text-color="white"/>
                     </q-item-section>
                     <q-item-section>
                         <q-item-label>Photos</q-item-label>
                         <q-item-label caption>February 22, 2016</q-item-label>
                     </q-item-section>
                     <q-item-section side>
-                        <q-icon name="info"/>
+                        <q-icon :name="ionHelpCircleOutline"/>
                     </q-item-section>
                 </q-item>
                 <q-separator inset spaced/>
                 <q-item-label header>Files</q-item-label>
                 <q-item v-for="n in 3" :key="`y.${n}`" clickable v-close-popup tabindex="0">
                     <q-item-section avatar>
-                        <q-avatar icon="assignment" color="primary" text-color="white"/>
+                        <q-avatar :icon="ionDocumentOutline" color="primary" text-color="white"/>
                     </q-item-section>
                     <q-item-section>
                         <q-item-label>Vacation</q-item-label>
                         <q-item-label caption>February 22, 2016</q-item-label>
                     </q-item-section>
                     <q-item-section side>
-                        <q-icon name="info"/>
+                        <q-icon :name="ionHelpCircleOutline"/>
                     </q-item-section>
                 </q-item>
             </q-list>
@@ -47,33 +53,35 @@ import Default from "@/layouts/Default.vue";
                             transition-show="jump-down"
                             transition-hide="jump-down"
                             style="margin-right: 0; "
+                            :dropdown-icon="ionChevronDownOutline"
+
             >
                 <q-list>
                     <q-item-label header>Folders</q-item-label>
                     <q-item v-for="n in 3" :key="`x.${n}`" clickable v-close-popup tabindex="0">
                         <q-item-section avatar>
-                            <q-avatar icon="folder" color="secondary" text-color="white"/>
+                            <q-avatar :icon="ionFolderOutline" color="secondary" text-color="white"/>
                         </q-item-section>
                         <q-item-section>
                             <q-item-label>Photos</q-item-label>
                             <q-item-label caption>February 22, 2016</q-item-label>
                         </q-item-section>
                         <q-item-section side>
-                            <q-icon name="info"/>
+                            <q-icon :name="ionHelpCircleOutline"/>
                         </q-item-section>
                     </q-item>
                     <q-separator inset spaced/>
                     <q-item-label header>Files</q-item-label>
                     <q-item v-for="n in 3" :key="`y.${n}`" clickable v-close-popup tabindex="0">
                         <q-item-section avatar>
-                            <q-avatar icon="assignment" color="primary" text-color="white"/>
+                            <q-avatar :icon="ionDocumentOutline" color="primary" text-color="white"/>
                         </q-item-section>
                         <q-item-section>
                             <q-item-label>Vacation</q-item-label>
                             <q-item-label caption>February 22, 2016</q-item-label>
                         </q-item-section>
                         <q-item-section side>
-                            <q-icon name="info"/>
+                            <q-icon :name="ionHelpCircleOutline"/>
                         </q-item-section>
                     </q-item>
                 </q-list>
