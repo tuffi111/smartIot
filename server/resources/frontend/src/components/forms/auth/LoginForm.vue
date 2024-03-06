@@ -51,6 +51,14 @@ const showPass = ref(false);
                             @click="showPass=!showPass"/>
                 </template>
             </q-input>
+
+            <q-checkbox name="stayAuth"
+                     label="Keep logged in"
+                     v-model="data['stayAuth']"
+                     :error="model.errors().has('stayAuth')"
+                     :error-message="model.errors().for('stayAuth')"
+                     class="q-pt-lg"
+            />
         </template>
     </model-view>
 

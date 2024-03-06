@@ -2,13 +2,13 @@
 import 'vue-json-pretty/lib/styles.css';
 import Default from "@/layouts/Default.vue";
 import {useApi} from '@app/requests'
-import {LoginModel} from "@/models/LoginModel";
+import {LoginModel} from "@/models/auth/LoginModel";
 import {useRouter} from 'vue-router';
-import {login} from "@app/auth";
+import {login, logout} from "@app/auth";
 import LoginForm from "@/components/forms/auth/LoginForm.vue";
 
-const FormData = new LoginModel()
-//const FormData = new LoginModel({email: 'apiuser@meetago.com'})
+//const FormData = new LoginModel()
+const FormData = new LoginModel({email: 'apiuser@meetago.com', password: 'secret'})
 const router = useRouter()
 const api = useApi();
 
@@ -19,19 +19,13 @@ const sendLogin = (e) => {
             router.push('/')
         },
         (error) => {
+            console.error(error)
             FormData.errors().set(error.response.data.errors)
         })
 }
 
-const logout = () => {
-    api('/logout')
-        .then(() => {
-            console.info('Logout successful')
-            localStorage.removeItem('token')
-        })
-        .catch(() => {
-            //console.error('Logout:', error)
-        })
+const sendLogout = () => {
+    logout()
 }
 
 const getPermissions = () => {
@@ -47,7 +41,7 @@ const getPermissions = () => {
         })
         .then((data) => {
             console.log('Api response data:', data)
-            //localStorage.setItem('token', data.token)
+            //authData.set('token', data.token)
         })
         .catch(() => {
             //console.error('ERROR', error)
@@ -72,7 +66,7 @@ const getPermissions = () => {
 
                 <q-card-actions align="around" class="q-pa-xl">
                     <router-link class="q-btn q-btn--flat cursor-pointer" to="/register">Sign-Up</router-link>
-                    <q-btn flat @click="logout">Logout</q-btn>
+                    <q-btn flat @click="sendLogout">Logout</q-btn>
                     <q-btn flat @click="getPermissions">Permissions</q-btn>
                     <q-btn color="primary" type="submit">Login</q-btn>
                 </q-card-actions>

@@ -9,6 +9,7 @@ export class LoginModel extends Model {
         return {
             email: '',
             password: '',
+            stayAuth: false,
         }
     }
 
