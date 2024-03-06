@@ -4,175 +4,121 @@
         -> reduce left drawer top to menu bottom; as in all other views (>mobile = pad/desktop/screen).
         -> reduce left drawer width to max viewport width - resize-handle-width
 -->
-<script>
-import {useSlots, ref, onBeforeMount, onMounted} from 'vue'
+<script setup>
+import {onMounted, ref, useSlots} from 'vue'
 import {useQuasar} from "quasar";
 import {logout} from "@app/auth.js";
 import {useBrowserSettings} from "@/services/browserSettings.js";
 import {Model} from "@app/models/Model.js";
 import {
-    ionAddCircleOutline, ionAppsOutline, ionContrastOutline, ionHardwareChipOutline,
-    ionHomeOutline, ionInformationCircleOutline,
-    ionMailOutline, ionMenuOutline, ionMoonOutline, ionPowerOutline,
+    ionAddCircleOutline,
+    ionContrastOutline,
+    ionHomeOutline,
+    ionInformationCircleOutline,
+    ionMailOutline,
+    ionMenuOutline,
+    ionPowerOutline,
     ionRefreshCircleOutline,
-    ionRemoveCircleOutline, ionSearchCircleOutline, ionSettingsOutline, ionWarningOutline
+    ionRemoveCircleOutline,
+    ionSettingsOutline,
+    ionWarningOutline
 } from "@quasar/extras/ionicons-v7";
 
-export default {
-    methods: {
-        ionAppsOutline() {
-            return ionAppsOutline
-        },
-        ionWarningOutline() {
-            return ionWarningOutline
-        },
-        ionMenuOutline() {
-            return ionMenuOutline
-        },
-        ionPowerOutline() {
-            return ionPowerOutline
-        },
-        ionInformationCircleOutline() {
-            return ionInformationCircleOutline
-        },
-        ionSearchCircleOutline() {
-            return ionSearchCircleOutline
-        },
-        ionSettingsOutline() {
-            return ionSettingsOutline
-        },
-        ionHardwareChipOutline() {
-            return ionHardwareChipOutline
-        },
-        ionContrastOutline() {
-            return ionContrastOutline
-        },
-        ionMoonOutline() {
-            return ionMoonOutline
-        },
-        ionRefreshCircleOutline() {
-            return ionRefreshCircleOutline
-        },
-        ionRemoveCircleOutline() {
-            return ionRemoveCircleOutline
-        },
-        ionAddCircleOutline() {
-            return ionAddCircleOutline
-        },
-        ionMailOutline() {
-            return ionMailOutline
-        },
-        ionHomeOutline() {
-            return ionHomeOutline
-        }, logout},
-    setup() {
-        const slots = useSlots()
-        const q = useQuasar();
-        const leftDrawerOpen = ref(false)
-        const rightDrawerOpen = ref(false)
-        let initialLeftDrawerWidth
-        const leftDrawerWidth = ref(300)
-        let defaultFontsize = 11
-        const browserSettings = useBrowserSettings()
 
-        browserSettings.bind(Model.EVENT_CHANGED, (data) => {
-            setTheme(data.themeMode);
-            applyFontSize(parseFloat(data.fontsize));
-        })
-
-        const getFontSize = () => {
-            return parseFloat(browserSettings.get('fontsize'))
-        }
-
-        const stepFontSize = (step = 1) => {
-            setFontSize(getFontSize() + step)
-        }
+const q = useQuasar();
+const slots = useSlots()
+const leftDrawerOpen = ref(false)
+const rightDrawerOpen = ref(false)
+const browserSettings = useBrowserSettings()
+const leftDrawerWidth = ref(300)
+let drawerWidth = leftDrawerWidth
+let initialLeftDrawerWidth
+let defaultFontsize = 11
+let isAuth = true
 
 
-        const setFontSize = (set) => {
-            set = parseFloat(set)
-            browserSettings.set('fontsize', set)
-            applyFontSize(set)
-        }
+browserSettings.bind(Model.EVENT_CHANGED, (data) => {
+    const {themeMode} = data;
+    setTheme(themeMode);
+    applyFontSize(parseFloat(data.fontsize));
+})
 
-        const applyFontSize = (size) => {
-            const list = getContainerElements()
-            for (let index = 0; index < list.length; ++index) {
-                list[index].style.fontSize = size + "px"
-            }
-        }
+function getFontSize() {
+    return parseFloat(browserSettings.get('fontsize'))
+}
 
-        const toggleTheme = () => {
-            setTheme(!browserSettings.get('themeMode'))
-            browserSettings.set('themeMode', q.dark.isActive)
-        }
-
-        const setTheme = (set) => {
-            if (set === undefined) {
-                q.dark.set("auto")
-            } else {
-                q.dark.set(set)
-            }
-        }
+function stepFontSize(step = 1) {
+    setFontSize(getFontSize() + step)
+}
 
 
-        const getContainerElements = (selector = null) => {
-            return document.querySelectorAll(selector ?? ".q-page-container")
-        }
+function setFontSize(set) {
+    set = parseFloat(set)
+    browserSettings.set('fontsize', set)
+    applyFontSize(set)
+}
 
-        const toggleLeftDrawer = () => {
-            leftDrawerOpen.value = !leftDrawerOpen.value
-        }
-
-        const toggleRightDrawer = () => {
-            rightDrawerOpen.value = !rightDrawerOpen.value
-        }
-
-        const resizeDrawer = (ev) => {
-            if (ev.isFirst === true) {
-                initialLeftDrawerWidth = leftDrawerWidth.value
-            }
-            leftDrawerWidth.value = initialLeftDrawerWidth + ev.offset.x
-        }
-
-        const sendLogout = async () => {
-            console.log('Send logout req');
-            let r = logout()
-                .then((data) => {
-                    console.info('Logout successful');
-                })
-                .catch((error) => {
-                    console.error('Logout error', error);
-                })
-
-            console.log('Send logout req done', r);
-
-            /**/
-        }
-
-        onMounted(() => {
-            setTheme(browserSettings.get('themeMode'));
-            applyFontSize(getFontSize())
-        })
-
-        return {
-            isAuth: true,
-            drawerWidth: leftDrawerWidth,
-            leftDrawerOpen,
-            rightDrawerOpen,
-            slots,
-            defaultFontsize,
-            getFontSize,
-            stepFontSize,
-            setFontSize,
-            toggleTheme,
-            resizeDrawer,
-            sendLogout,
-            toggleLeftDrawer,
-            toggleRightDrawer
-        }
+function applyFontSize(size) {
+    const list = getContainerElements()
+    for (let index = 0; index < list.length; ++index) {
+        list[index]["style"].fontSize = size + "px"
     }
 }
+
+function toggleTheme() {
+    setTheme(!browserSettings.get('themeMode'))
+    browserSettings.set('themeMode', q.dark.isActive)
+}
+
+function setTheme(set) {
+    if (set === undefined) {
+        q.dark.set("auto")
+    } else {
+        q.dark.set(set)
+    }
+}
+
+
+function getContainerElements(selector = null) {
+    return document.querySelectorAll(selector ?? ".q-page-container")
+}
+
+function toggleLeftDrawer() {
+    leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function toggleRightDrawer() {
+    rightDrawerOpen.value = !rightDrawerOpen.value
+}
+
+function closeRightDrawer() {
+    rightDrawerOpen.value = false
+}
+
+
+function resizeDrawer(ev) {
+    if (ev.isFirst === true) {
+        initialLeftDrawerWidth = leftDrawerWidth.value
+    }
+    leftDrawerWidth.value = initialLeftDrawerWidth + ev.offset.x
+}
+
+async function sendLogout() {
+    logout()
+        .then((data) => {
+            console.debug('Logout successful', data);
+        })
+        .catch((error) => {
+            console.error('Logout error', error);
+        })
+}
+
+onMounted(() => {
+    setTheme(browserSettings.get('themeMode'));
+    applyFontSize(getFontSize())
+})
+
+
 </script>
 
 
@@ -183,10 +129,11 @@ export default {
             <q-toolbar>
 
                 <q-btn flat to="/">
-                    <q-avatar :icon="ionHomeOutline()" size="26px"/>
+                    <q-avatar :icon="ionHomeOutline" size="26px"/>
                 </q-btn>
 
-                <q-btn v-if="slots.sidebar" dense flat round auto-close :icon="ionMenuOutline()" @click="toggleLeftDrawer"/>
+                <q-btn v-if="slots.sidebar" dense flat round auto-close :icon="ionMenuOutline"
+                       @click="toggleLeftDrawer"/>
 
                 <div v-if="slots.menu">
                     <slot name="menu"/>
@@ -198,7 +145,7 @@ export default {
                            class="q-ma-lg"
                            style="margin-left: 0;margin-top: 0;margin-bottom: 0;"
                     >
-                        <q-avatar :icon="ionMailOutline()" size="26px">
+                        <q-avatar :icon="ionMailOutline" size="26px">
                             <q-badge color="red" floating transparent>
                                 3
                             </q-badge>
@@ -217,7 +164,7 @@ export default {
                                 </q-item-label>
                                 <q-item v-for="n in 3" :key="`x.${n}`" clickable v-close-popup tabindex="0" class="">
                                     <q-item-section avatar>
-                                        <q-avatar :icon="ionWarningOutline()" color="warning"/>
+                                        <q-avatar :icon="ionWarningOutline" color="warning"/>
                                     </q-item-section>
                                     <q-item-section>
                                         <q-item-label>
@@ -246,7 +193,7 @@ export default {
                         </q-menu>
                     </q-btn>
 
-                    <q-btn dense flat round @click="toggleRightDrawer">
+                    <q-btn dense flat round auto-close @click="toggleRightDrawer">
                         <q-avatar size="38px">
                             <img src="../assets/avatar4.jpg" alt="Avatar">
                         </q-avatar>
@@ -277,7 +224,6 @@ export default {
             overlay
             bordered
         >
-
             <q-scroll-area style="height: calc(100% - 150px);">
                 <q-list padding>
                     <q-item>
@@ -296,19 +242,21 @@ export default {
 
                     <q-item>
                         <q-item-section>
-                            <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline()" @click="toggleTheme"/>
+                            <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline" @click="toggleTheme"/>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn title="Decrease fontsize" :icon="ionRemoveCircleOutline()" @click="stepFontSize(-1)"/>
+                            <q-btn title="Decrease fontsize" :icon="ionRemoveCircleOutline"
+                                   @click="stepFontSize(-1)"/>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn title="Reset fontsize" :icon="ionRefreshCircleOutline()" @click="setFontSize(defaultFontsize)"></q-btn>
+                            <q-btn title="Reset fontsize" :icon="ionRefreshCircleOutline"
+                                   @click="setFontSize(defaultFontsize)"></q-btn>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn title="Increase fontsize" :icon="ionAddCircleOutline()" @click="stepFontSize(1)"/>
+                            <q-btn title="Increase fontsize" :icon="ionAddCircleOutline" @click="stepFontSize(1)"/>
                         </q-item-section>
 
 
@@ -318,7 +266,7 @@ export default {
 
                     <q-item clickable v-ripple to="/settings">
                         <q-item-section avatar>
-                            <q-icon title="Settings" :name="ionSettingsOutline()"/>
+                            <q-icon title="Settings" :name="ionSettingsOutline"/>
                         </q-item-section>
                         <q-item-section>
                             Settings
@@ -327,7 +275,7 @@ export default {
 
                     <q-item clickable v-ripple to="/about">
                         <q-item-section avatar>
-                            <q-icon title="About" :name="ionInformationCircleOutline()"/>
+                            <q-icon title="About" :name="ionInformationCircleOutline"/>
                         </q-item-section>
                         <q-item-section>
                             About
@@ -339,7 +287,7 @@ export default {
                     <q-item clickable v-ripple
                             @click="sendLogout">
                         <q-item-section avatar>
-                            <q-icon title="Logout" :name="ionPowerOutline()"/>
+                            <q-icon title="Logout" :name="ionPowerOutline"/>
                         </q-item-section>
 
                         <q-item-section>
@@ -352,20 +300,15 @@ export default {
         </q-drawer>
 
         <!-- PAGE CONTENT-->
-        <q-page-container class="q-ma-md">
-            <slot></slot>
+        <q-page-container class="q-ma-md" @click="closeRightDrawer">
+            <slot @click="closeRightDrawer"></slot>
         </q-page-container>
 
 
         <!-- FOOTER-->
-        <q-footer elevated class="bg-grey-10 text-white">
-            <q-tabs align="center" stretch>
-                <q-route-tab to="/devices" label="Devices" :icon="ionHardwareChipOutline()"/>
-                <q-route-tab to="/examples" label="Examples" :icon="ionSearchCircleOutline()"/>
-                <q-route-tab to="/scenarios" label="Scenarios" :icon="ionAppsOutline()"/>
-            </q-tabs>
+        <q-footer v-if="slots.footer" elevated class="bg-grey-10 text-white" @click="closeRightDrawer">
+            <slot name="footer" @click="closeRightDrawer"/>
         </q-footer>
-
     </q-layout>
 </template>
 

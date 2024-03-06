@@ -1,7 +1,7 @@
 <script setup>
 import 'vue-json-pretty/lib/styles.css';
 import VueJsonPretty from "vue-json-pretty";
-import ModelView from "@/components/ModelView.vue";
+import ModelView from "@app/models/ModelView.vue";
 import {useStore} from "vuex";
 import {Model} from "@app/models/Model.js";
 import {ApiDataModel} from "@/models/examples/ApiDataModel.js";
@@ -10,7 +10,7 @@ import {LocalDataModel} from "@/models/examples/LocalDataModel.js";
 import {CookieDataModel} from "@/models/examples/CookieDataModel.js";
 import {SessionDataModel} from "@/models/examples/SessionDataModel.js";
 import ModelComponentExample from "@/components/ModelComponentExample.vue";
-import {useBrowserSettings} from "@/services/browserSettings.js";
+//import {useBrowserSettings} from "@/services/browserSettings.js";
 import {onBeforeMount} from "vue";
 
 const store = useStore()
@@ -61,15 +61,15 @@ onBeforeMount(() => {
     <h4>Cookie Model</h4>
     <model-view :model="cookieModel">
         <template v-slot="{ data }">
-            Theme: <input v-model="data.theme">
+            Theme: <input v-model="data['theme']">
             <br>
-            Type: <input v-model="data.type">
+            Type: <input v-model="data['type']">
             <br>
-            Address.Street: <input v-model="data.address.street">
+            Address.Street: <input v-model="data['address'].street">
             <br>
-            Address.Zip: <input v-model="data.address.zip">
+            Address.Zip: <input v-model="data['address'].zip">
             <br>
-            Address.City: <input v-model="data.address.city">
+            Address.City: <input v-model="data['address'].city">
             <br>
             <vue-json-pretty :data="data" class="collapsed" :deep="1"/>
         </template>

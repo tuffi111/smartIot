@@ -28,7 +28,7 @@ abstract class Utils
     /**
      * @throws Exception
      */
-    static function compileBlaseString(string $bladeString, array $data = []): string|false
+    static function compileBladeString(string $bladeString, array $data = []): string|false
     {
         $compiledString = Blade::compileString($bladeString);
         ob_start() and extract($data, EXTR_SKIP);
@@ -112,7 +112,7 @@ abstract class Utils
         $silent = true
     ): SentMessage|false|null {
         // Always provide an array
-        if (!is_array($receivers) && !is_object($receivers) && !$receivers instanceof Arrayable) {
+        if (!is_array($receivers) && !is_object($receivers) && !($receivers instanceof Arrayable)) {
             $receivers = [$receivers];
         }
 

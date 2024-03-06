@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\Auth\ApiAuthController;
 use App\Http\Controllers\Api\ModelController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Middleware\Cors;
 use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Support\Facades\Route;
 
@@ -22,19 +21,18 @@ use Illuminate\Support\Facades\Route;
 //Auth::routes();
 
 Route::middleware([
-    Cors::class,
     ForceJsonResponse::class,
     //Language::class,
 ])->group(function () {
     //Route::put('login', [ApiAuthController::class, 'register'])->name('auth.api.register');
+    Route::middleware(['auth:api', 'web'])->group(function () {
+        Route::get('logout', [ApiAuthController::class, 'logout'])->name('auth.api.logout');
+        Route::get('permissions', [ApiAuthController::class, 'permissions'])->name('auth.api.permissions');
+        Route::get('user/get', [UserController::class, 'get']);
+    });
 });
 
 
-Route::middleware(['auth:api', 'web'])->group(function () {
-    Route::get('logout', [ApiAuthController::class, 'logout'])->name('auth.api.logout');
-    Route::get('permissions', [ApiAuthController::class, 'permissions'])->name('auth.api.permissions');
-    Route::get('user/get', [UserController::class, 'get']);
-});
 
 
 
@@ -42,6 +40,7 @@ Route::prefix('models')->group(function () {
     Route::get('{model}', [ModelController::class, 'fetch']);
     Route::post('{model}', [ModelController::class, 'update']);
 });
+
 
 
 /*

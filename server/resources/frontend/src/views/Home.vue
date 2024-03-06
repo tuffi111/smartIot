@@ -1,11 +1,18 @@
 <script setup>
 import Default from "@/layouts/Default.vue";
 import {
-    ionChevronDownOutline,
+    ionAppsOutline, ionChevronDownOutline,
     ionDocumentOutline,
     ionFolderOutline,
-    ionHelpCircleOutline
+    ionHardwareChipOutline,
+    ionHelpCircleOutline,
+    ionSearchCircleOutline
 } from "@quasar/extras/ionicons-v7";
+import {reactive} from "vue";
+
+const permissions = reactive([]);
+
+
 </script>
 
 <template>
@@ -88,7 +95,17 @@ import {
             </q-btn-dropdown>
         </template>
 
-        <!-- Content -->
+        <!-- FOOTER -->
+        <template v-slot:footer>
+            <q-tabs align="center" stretch>
+                <q-route-tab to="/devices" label="Devices" :icon="ionHardwareChipOutline"/>
+                <q-route-tab to="/examples" label="Examples" :icon="ionSearchCircleOutline"/>
+                <q-route-tab to="/scenarios" label="Scenarios" :icon="ionAppsOutline"/>
+            </q-tabs>
+
+        </template>
+
+        <!-- CONTENT -->
         <router-view/>
 
     </default>
