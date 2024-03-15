@@ -67,6 +67,11 @@ onBeforeMount(() => {
     <vue-json-pretty :data="sessionModel.data()" :deep="1"/>
 
     <hr>
+    <h4>CookieStorage Model</h4>
+    <model-component-example :model="cookieModel"></model-component-example>
+    <vue-json-pretty :data="cookieModel.data()" :deep="1"/>
+
+    <hr>
     <h4>Vuex Store Model</h4>
     <model-component-example :model="vuexModel"></model-component-example>
     <vue-json-pretty :data="vuexModel.data()" :deep="0"/><hr>
