@@ -15,6 +15,13 @@ const routes = [
                 ]
             },
             {
+                path: '/examples2',
+                component: () => import("@/views/home/Examples.vue"),
+                children: [
+                    {path: '', component: () => import("@/views/home/examples/Index2.vue")},
+                ]
+            },
+            {
                 path: '/scenarios',
                 component: () => import("@/views/home/Scenarios.vue"),
                 children: [

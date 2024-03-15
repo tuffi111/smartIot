@@ -1,9 +1,14 @@
-import {LocalModel} from "@app/models/LocalModel.js";
+import {Model} from "@app/models2/Model.js";
+import {LocalStorage} from "@app/models2/Storage/LocalStorage.js";
 
-export class LocalDataModel extends LocalModel {
+export class LocalDataModel extends Model {
 
-    name() {
-        return "LocalData"
+    name(){
+      return 'LocalData'
+    }
+
+    makeStorage() {
+        return new LocalStorage()
     }
 
     model(){

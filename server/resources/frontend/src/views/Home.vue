@@ -100,6 +100,7 @@ const permissions = reactive([]);
             <q-tabs align="center" stretch>
                 <q-route-tab to="/devices" label="Devices" :icon="ionHardwareChipOutline"/>
                 <q-route-tab to="/examples" label="Examples" :icon="ionSearchCircleOutline"/>
+                <q-route-tab to="/examples2" label="Examples2" :icon="ionSearchCircleOutline"/>
                 <q-route-tab to="/scenarios" label="Scenarios" :icon="ionAppsOutline"/>
             </q-tabs>
 

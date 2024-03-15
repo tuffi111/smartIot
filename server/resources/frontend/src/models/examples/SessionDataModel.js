@@ -1,9 +1,14 @@
-import {SessionModel} from "@app/models/SessionModel.js";
+import {Model} from "@app/models2/Model.js";
+import {SessionStorage} from "@app/models2/Storage/SessionStorage.js";
 
-export class SessionDataModel extends SessionModel {
+export class SessionDataModel extends Model {
 
     name() {
         return "SessionData"
+    }
+
+    makeStorage() {
+        return new SessionStorage()
     }
 
     model(){

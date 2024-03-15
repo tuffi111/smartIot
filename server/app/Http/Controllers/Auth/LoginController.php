@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AuthResource;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,10 +31,9 @@ class LoginController extends Controller
     {
         //todo: do nit revoke to much
         $user->tokens()->delete();
-        return new JsonResponse([
+        return AuthResource::byUser($user)->additional([
             'token' => $user->createToken('Laravel Password Grant Client')->accessToken,
-            'permissions' => $user->permissions()->get(),
-        ], 200);
+        ]);
     }
 
 
@@ -48,10 +48,8 @@ class LoginController extends Controller
 
     protected function loggedOut(Request $request)
     {
-
         return redirect('/');
-        return new JsonResponse([
-        ], 200);
+
     }
 
 }

@@ -7,7 +7,8 @@
 <script setup>
 import {onMounted, ref, useSlots} from 'vue'
 import {useQuasar} from "quasar";
-import {logout} from "@app/auth.js";
+import {useRouter} from "vue-router";
+import {logout, can, isAuth} from "@app/auth.js";
 import {useBrowserSettings} from "@/services/browserSettings.js";
 import {Model} from "@app/models/Model.js";
 import {
@@ -25,6 +26,8 @@ import {
 } from "@quasar/extras/ionicons-v7";
 
 
+
+const router = useRouter()
 const q = useQuasar();
 const slots = useSlots()
 const leftDrawerOpen = ref(false)
@@ -34,7 +37,6 @@ const leftDrawerWidth = ref(300)
 let drawerWidth = leftDrawerWidth
 let initialLeftDrawerWidth
 let defaultFontsize = 11
-let isAuth = true
 
 
 browserSettings.bind(Model.EVENT_CHANGED, (data) => {
@@ -104,12 +106,14 @@ function resizeDrawer(ev) {
 }
 
 async function sendLogout() {
-    logout()
-        .then((data) => {
+    logout((data) => {
             console.debug('Logout successful', data);
-        })
-        .catch((error) => {
+        },
+        (error) => {
             console.error('Logout error', error);
+        },
+        () => {
+            router.push('/login')
         })
 }
 
@@ -140,8 +144,9 @@ onMounted(() => {
                 </div>
                 <q-space/>
 
-                <div v-if="isAuth" class="">
-                    <q-btn round flat
+                <div v-if="isAuth()" class="">
+                    <q-btn v-if="can('notifications')"
+                           round flat
                            class="q-ma-lg"
                            style="margin-left: 0;margin-top: 0;margin-bottom: 0;"
                     >
@@ -198,9 +203,8 @@ onMounted(() => {
                             <img src="../assets/avatar4.jpg" alt="Avatar">
                         </q-avatar>
                     </q-btn>
-
-
                 </div>
+
                 <div v-else>
                     <q-btn label="Login" to="/login" stretch flat/>
                     <q-btn label="Register" to="/register" stretch flat/>
@@ -264,7 +268,7 @@ onMounted(() => {
 
                     <q-separator/>
 
-                    <q-item clickable v-ripple to="/settings">
+                    <q-item v-if="can('settings')" clickable v-ripple to="/settings">
                         <q-item-section avatar>
                             <q-icon title="Settings" :name="ionSettingsOutline"/>
                         </q-item-section>
@@ -273,7 +277,7 @@ onMounted(() => {
                         </q-item-section>
                     </q-item>
 
-                    <q-item clickable v-ripple to="/about">
+                    <q-item v-if="can('about')" clickable v-ripple to="/about">
                         <q-item-section avatar>
                             <q-icon title="About" :name="ionInformationCircleOutline"/>
                         </q-item-section>

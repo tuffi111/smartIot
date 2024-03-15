@@ -26,9 +26,9 @@ const register = (e) => {
                 //todo: notetify('Login failed', response)
             }
         })
-        .then((data) => {
+        .then((responseData) => {
             //localStorage.setItem('token', data.token)
-            authData.set('token', data.token)
+            authData.set('token', responseData.token)
         })
         .catch((error) => {
             FormData.errors().set(error.response.data.errors)

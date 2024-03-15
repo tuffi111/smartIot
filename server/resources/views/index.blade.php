@@ -22,7 +22,7 @@
     will be overwritten by main.js/vue
 --></div>
 <script>
-    var Auth = JSON.parse( '@json($auth)' );
+    let Auth = {!! $auth !!};
 </script>
 
 {{ Vite::useBuildDirectory('.') }}

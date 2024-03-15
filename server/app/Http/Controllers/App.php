@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
+use App\Http\Resources\AuthResource;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class App extends Controller
 {
-    function index(): View
+    function index(Request $request): View
     {
-        if (Auth::guest()) {
-            return view('index', ['auth' => null]);
-        } else {
-            return view('index', ['auth' => ['user' => Auth::user()]]);
-        }
+        return view('index', ['auth' => AuthResource::byUser($request->user())->toJson() ]);
     }
 }

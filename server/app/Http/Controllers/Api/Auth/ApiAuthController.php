@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AuthResource;
 use App\Models\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\JsonResponse;
@@ -33,21 +34,24 @@ class ApiAuthController extends Controller
         $user = User::create($request->toArray());
         $token = $user->createToken('Laravel Password Grant Client');
 
-        $response = ['token' => $token->accessToken];
-
-        return response($response, 200);
+        return AuthResource::byUser($user)->additional([
+            'token' => $token->accessToken,
+        ]);
     }
 
     function logout(Request $request)
     {
         Auth::user()->token()->revoke();
         Auth::guard('web')->logout();
-        return new JsonResponse(null, 200);
+
+        return AuthResource::byUser(Auth::user())->additional([
+            'state' => 'ok',
+        ]);
     }
 
 
     function permissions(Request $request)
     {
-        return new JsonResponse(Auth::user()->permissions()->get());
+        return AuthResource::byUser($request->user());
     }
 }

@@ -1,18 +1,23 @@
-import {CookieModel} from "@app/models/CookieModel.js";
+import {Model} from "@app/models2/Model.js";
+import {CookieStorage} from "@app/models2/Storage/CookieStorage.js";
 
-export class CookieDataModel extends CookieModel {
+export class CookieDataModel extends Model{
 
-    name(){
+    name() {
         return "CookieData"
     }
 
-    model(){
+    makeStorage() {
+        return new CookieStorage()
+    }
+
+    model() {
         return {
             theme: 'COOKIE-theme',
             type: 1,
             address: {street: 'aaa', zip: 'aaa111', city: 'aaa111aaa'},
-            tags: {'tag-1':'tag-1', 'tag-11':'tag-11', 'tag-111':'tag-111'},
-            rights: ['read','write'],
+            tags: {'tag-1': 'tag-1', 'tag-11': 'tag-11', 'tag-111': 'tag-111'},
+            rights: ['read', 'write'],
             time: '11:00:00'
         }
     }
