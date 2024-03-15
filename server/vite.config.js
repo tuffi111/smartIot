@@ -5,6 +5,9 @@ import {quasar, transformAssetUrls} from "@quasar/vite-plugin";
 import vue from '@vitejs/plugin-vue'
 import laravel from 'laravel-vite-plugin';
 import path from "node:path";
+import './resources/frontend/app/utils/dotEnv'
+
+//const url = 'file://' + process.env.PWD + '/vite.config.js';
 
 export default ({mode}) => {
     process.env = {...process.env, ...loadEnv(mode, process.cwd())};
@@ -56,8 +59,10 @@ export default ({mode}) => {
         ],
         resolve: {
             alias: {
-                '@': fileURLToPath(new URL('./resources/frontend/src', import.meta.url)),
-                '@app': fileURLToPath(new URL('./resources/frontend/app', import.meta.url)),
+                '@': path.resolve('./resources/frontend/src'),
+                //'@': fileURLToPath(new URL('./resources/frontend/src', url)),
+                '@app': path.resolve('./resources/frontend/app'),
+                //'@app': fileURLToPath(new URL('./resources/frontend/app', url)),
                 'ziggy': path.resolve('vendor/tightenco/ziggy/dist/index.es'),
                 //'ziggyVue': path.resolve('vendor/tightenco/ziggy/dist/vue.es'),
             }
