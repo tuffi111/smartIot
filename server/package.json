@@ -4,6 +4,7 @@
     "description": "A Quasar Project",
     "productName": "Quasar App",
     "author": "",
+    "type": "module",
     "private": true,
     "scripts": {
         "-- BACKEND ----------": "",
