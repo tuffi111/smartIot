@@ -6,7 +6,7 @@ authorize: ~/.ssh/id_rsa.pub
 keys:
   - ~/.ssh/id_rsa
 folders:
-  - map: /home/tuffi/Dokumente/Arduino/smartIot/server
+  - map: /home/thomas/Dokumente/Projects/smartIot/server
     to: /home/vagrant/code
 sites:
   - map: smart-server.test
@@ -17,9 +17,9 @@ features:
   - pm2: true
   - rabbitmq: true
   - python: true
-  - mysql: true
+  - mysql: false
   - mailpit: true
-  - mariadb: false
+  - mariadb: true
   - postgresql: false
   - ohmyzsh: false
   - webdriver: false

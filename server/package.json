@@ -68,10 +68,10 @@
     },
     "dependencies": {
         "@quasar/extras": "^1.16",
-        "@vitejs/plugin-vue": "^4.6.2",
+        "@vitejs/plugin-vue": "^5.0",
         "@vueuse/core": "^10.9",
         "axios": "^1.6",
-        "dotenv": "^16.4.5",
+        "dotenv": "^16.4",
         "puppeteer": "^22.5",
         "quasar": "^2.15",
         "vue": "^3.4",
