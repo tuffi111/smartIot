@@ -4,6 +4,8 @@
 # -> everything needed to run artisan & node
 
 CURDIR=pwd=$(pwd)
+DIST_DIR=./public
+
 echo "Install app in $CURDIR"
 
 # Check if .env file existing
@@ -65,6 +67,20 @@ if [ -z "$APP_KEY" ]; then
     source "$ENV_FILE"
     echo "App key generated: $APP_KEY"
 fi
+
+echo "Ensure public directory '$DIST_DIR'..."
+if [ -d $DIST_DIR ]; then
+    echo "... already exists."
+else
+    echo "... create directory & set permissions."
+    mkdir $DIST_DIR
+    chown vagrant:vagrant $DIST_DIR
+    chmod 775 $DIST_DIR
+fi
+echo "Ensure public directory done."
+
+echo "Build & copy public frontend files..."
+./vite.sh build --emptyOutDir
 
 # Done
 echo "App install finished. To configure app, run:"
