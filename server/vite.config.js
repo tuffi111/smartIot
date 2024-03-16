@@ -5,7 +5,7 @@ import {quasar, transformAssetUrls} from "@quasar/vite-plugin";
 import vue from '@vitejs/plugin-vue'
 import laravel from 'laravel-vite-plugin';
 import path from "node:path";
-import './resources/js/frontend/utils/dotEnv'
+import './resources/frontend/utils/dotEnv'
 
 //const url = 'file://' + process.env.PWD + '/vite.config.js';
 
@@ -59,7 +59,7 @@ export default ({mode}) => {
         ],
         resolve: {
             alias: {
-                '@': path.resolve('./resources/js/frontend'),
+                '@': path.resolve('./resources/frontend'),
                 //'@p': fileURLToPath(new URL('./resources/frontend/app', url)),
                 '@app': path.resolve('./resources/js/app'),
                 //'@app': fileURLToPath(new URL('./resources/frontend/src', url)),
