@@ -2,21 +2,22 @@
 import 'vue-json-pretty/lib/styles.css';
 import VueJsonPretty from "vue-json-pretty";
 import {useStore} from "vuex";
-import {LocalDataModel} from "@app/models/examples/LocalDataModel.js";
 import {onBeforeMount} from "vue";
-import {Model} from "@/models2/Model.js";
-import ModelComponentExample from "@app/components/ModelComponentExample.vue";
-import {MyVueXModel} from "@app/models/examples/MyVueXModel.js";
-import {CookieDataModel} from "@app/models/examples/CookieDataModel.js";
-import {SessionDataModel} from "@app/models/examples/SessionDataModel.js";
-import {CookieStorage} from "@/models2/Storage/CookieStorage.js";
+import {Model} from "@/models2/Model";
+import {MyVueXModel} from "@app/models/examples/MyVueXModel";
+import {ApiDataModel} from "@app/models/examples/ApiDataModel";
+import {CookieStorage} from "@/models2/Storage/CookieStorage";
+import {LocalDataModel} from "@app/models/examples/LocalDataModel";
+import {CookieDataModel} from "@app/models/examples/CookieDataModel";
+import {SessionDataModel} from "@app/models/examples/SessionDataModel";
+import ModelFormExample from "@app/components/ModelFormExample.vue";
 
 const store = useStore()
+const apiModel = new ApiDataModel();
 const vuexModel = new MyVueXModel()
 const localModel = new LocalDataModel()//.storage(new CookieStorage())
 const cookieModel = new CookieDataModel()
 const sessionModel = new SessionDataModel();
-
 
 const basicModel = new Model({
     theme: 'Model-theme',
@@ -28,6 +29,7 @@ const basicModel = new Model({
 })
 
 console.log('XXX - VUEX: store', store);
+console.log('XXX - MODELS: apiModel data', apiModel.data());
 console.log('XXX - MODELS: vuexModel data', vuexModel.data());
 console.log('XXX - MODELS: basicModel data', basicModel.data());
 console.log('XXX - MODELS: localModel data', localModel.data());
@@ -58,22 +60,28 @@ onBeforeMount(() => {
 
     <hr>
     <h4>LocalStorage Model</h4>
-    <model-component-example :model="localModel"></model-component-example>
+    <model-form-example :model="localModel"></model-form-example>
     <vue-json-pretty :data="localModel.data()" :deep="1"/>
 
     <hr>
     <h4>SessionStorage Model</h4>
-    <model-component-example :model="sessionModel"></model-component-example>
+    <model-form-example :model="sessionModel"></model-form-example>
     <vue-json-pretty :data="sessionModel.data()" :deep="1"/>
 
     <hr>
     <h4>CookieStorage Model</h4>
-    <model-component-example :model="cookieModel"></model-component-example>
+    <model-form-example :model="cookieModel"></model-form-example>
     <vue-json-pretty :data="cookieModel.data()" :deep="1"/>
 
     <hr>
+    <h4>ApiStorage Model</h4>
+    <model-form-example :model="apiModel"></model-form-example>
+    <vue-json-pretty :data="apiModel.data()" :deep="1"/>
+
+
+    <hr>
     <h4>Vuex Store Model</h4>
-    <model-component-example :model="vuexModel"></model-component-example>
+    <model-form-example :model="vuexModel"></model-form-example>
     <vue-json-pretty :data="vuexModel.data()" :deep="0"/><hr>
 
     <hr>

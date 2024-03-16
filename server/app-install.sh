@@ -68,6 +68,10 @@ if [ -z "$APP_KEY" ]; then
     echo "App key generated: $APP_KEY"
 fi
 
+
+echo "Ziggy: Generate backend routes js..."
+php artisan ziggy:generate
+
 echo "Ensure public directory '$DIST_DIR'..."
 if [ -d $DIST_DIR ]; then
     echo "... already exists."

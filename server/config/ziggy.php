@@ -4,7 +4,7 @@
 use App\Ziggy\AppRoute;
 
 return [
-    'only' => ['api.*'],
+    'only' => ['api.*','auth.*'],
     'output' => [
         'script' => AppRoute::class,
     ]

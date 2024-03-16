@@ -1,6 +1,6 @@
 import {defineConfig, loadEnv, normalizePath} from 'vite'
 import {viteStaticCopy} from "vite-plugin-static-copy";
-import {fileURLToPath, URL} from 'node:url'
+//import {fileURLToPath, URL} from 'node:url'
 import {quasar, transformAssetUrls} from "@quasar/vite-plugin";
 import vue from '@vitejs/plugin-vue'
 import laravel from 'laravel-vite-plugin';
@@ -63,7 +63,7 @@ export default ({mode}) => {
                 //'@p': fileURLToPath(new URL('./resources/frontend/app', url)),
                 '@app': path.resolve('./resources/js/app'),
                 //'@app': fileURLToPath(new URL('./resources/frontend/src', url)),
-                'ziggy': path.resolve('vendor/tightenco/ziggy/dist/index.es'),
+                'ziggy': path.resolve('vendor/tightenco/ziggy/src/js/browser.js'),
                 //'ziggyVue': path.resolve('vendor/tightenco/ziggy/dist/vue.es'),
             }
         },

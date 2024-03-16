@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\ApiAuthController;
-use App\Http\Controllers\Api\ModelController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\ForceJsonResponse;
 use Illuminate\Http\JsonResponse;
@@ -20,43 +18,42 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::fallback(function () {
-    return new JsonResponse(['state' => 'error','message'=>'Unknown api route', 'errors'=>['message'=>'Unknown api route']], 404);
+    return new JsonResponse([
+        'state' => 'error',
+        'message' => 'Unknown api route',
+        'errors' => ['request' => 'Unknown api route']
+    ], 404);
 })->name('index');
 
 //Auth::routes();
 
-Route::middleware([
-    ForceJsonResponse::class,
-    //Language::class,
-])->group(function () {
-    //Route::put('login', [ApiAuthController::class, 'register'])->name('auth.api.register');
-    Route::middleware(['auth:api', 'web'])
-        ->group(function () {
-            Route::get('logout', [ApiAuthController::class, 'logout'])->name('auth.api.logout');
-            Route::get('user/get', [UserController::class, 'get']);
-            Route::get('permissions', [ApiAuthController::class, 'permissions'])->name('auth.api.permissions');
-
-
-            Route::prefix('models')->group(function () {
-                Route::get('{model}', [ModelController::class, 'fetch']);
-                Route::post('{model}', [ModelController::class, 'update']);
+// api
+Route::name('api.')
+    ->middleware([ForceJsonResponse::class /*,Language::class*/])
+    ->group(function () {
+        // api.auth
+        Route::name('auth.')
+            ->prefix('auth')
+            ->middleware(['auth:api', 'web'])
+            ->group(function () {
+                require('api/auth.php');
             });
 
-        });
-});
-
-
-
-
-/*
-Route::prefix('api')
-    ->name('api.')
-    ->middleware(Language::class)
-    ->group(function () {
-        Route::prefix('user')
-            ->name('user.')
+        // api.models
+        Route::name('models.')
+            ->prefix('models')
+            ->middleware(['auth:api', 'web'])
             ->group(function () {
-                //Route::get('login', [Location::class, 'detail'])->name('login');
+                require('api/models.php');
+            });
+
+
+        Route::name('users.')
+            ->prefix('users')
+            ->middleware(['auth:api', 'web'])
+            ->group(function () {
+                Route::get('fetch', [UserController::class, 'fetch'])->name('fetch');
+                Route::post('update', [UserController::class, 'update'])->name('update');
+
             });
     });
-/**/

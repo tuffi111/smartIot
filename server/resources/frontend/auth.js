@@ -2,6 +2,7 @@ import {useApi, useHttp} from "@/requests.js";
 import {AuthModel} from "@app/models/auth/AuthModel.js";
 import {UserModel} from "@app/models/auth/UserModel.js";
 import {reactive, ref} from "vue";
+import {resolveRoute} from "@/backend-router.js";
 
 
 const _authData = new AuthModel()
@@ -33,7 +34,7 @@ export function user() {
 }
 
 export async function login(loginData, onSuccess, onError) {
-    return useHttp()('/login', {method: "POST", data: loginData})
+    return useHttp()(resolveRoute('auth.login'), {method: "POST", data: loginData})
         .then((response) => {
             return response.data
         })
@@ -63,7 +64,7 @@ export async function login(loginData, onSuccess, onError) {
 }
 
 export function logout(onSuccess = null, onError = null, onFinally = null) {
-    return useApi()('/logout')
+    return useApi()(resolveRoute('api.auth.logout'))
         .then((response) => {
             if (response['data'] && response['data']['state'] === 'ok') {
                 refresh(response.data)

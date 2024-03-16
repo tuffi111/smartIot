@@ -1,10 +1,16 @@
 import {Storage} from './Storage'
 import {Cookie} from "@/utils/cookie.js";
+import {useApi} from "@/requests.js";
 
 
 export class CookieStorage extends Storage {
 
-    _cookieStore = new Cookie()
+    _cookieStore
+
+    constructor(...args) {
+        super(...args);
+        this._cookieStore = new Cookie()
+    }
 
     makeStore() {
         return {
