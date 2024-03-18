@@ -1,7 +1,6 @@
 import {Storage} from './Storage'
 import {useApi} from "@/requests.js";
 import {apiRoute, resolveRoute} from "@/backend-router.js";
-import {reactive, ref} from "vue";
 
 
 export class ApiStorage extends Storage {
@@ -39,12 +38,10 @@ export class ApiStorage extends Storage {
                     .then((data) => {
                         console.log('API-GET-CALL-RESPONSE:', data)
                         console.table(data)
-                        this.model().assignData(data, false)
-                        this.raise(ApiStorage.EVENT_CHANGED, data)
+                        this.model().assignData(data)
                     })
                     .catch((error) => {
                         console.warn('API-GET-CALL-ERROR:', error)
-                        //this.raiseError("ApiModel/" + this.model().name() + ": No api update possible. Last error: ", error);
                     })
             },
             save: (data) => {
@@ -54,27 +51,23 @@ export class ApiStorage extends Storage {
                 return this.apiCall(method, route, data)
                     .then((data) => {
                         console.log('API-SAVE-CALL-RESPONSE:', data)
-                        this.model().assignData(data, false)
-                        this.raise(ApiStorage.EVENT_CHANGED, data)
+                        this.model().assignData(data)
                     })
                     .catch((error) => {
                         console.warn('API-SAVE-CALL-ERROR:', error)
-                        //this.raiseError("ApiModel/" + this.model().name() + ": No api update possible. Last error: ", error);
                     })
             }
         }
     }
 
     get() {
-        try {
-            return this.store().load()
-        } catch (error) {
-            return {}
-        }
+        this.store().load()
+        return this
     }
 
     set(data) {
-        return this.store().save(data)
+        this.store().save(data)
+        return this
     }
 
     routes(set = null) {
@@ -120,13 +113,12 @@ export class ApiStorage extends Storage {
                 if (handlerQueue.length) {
                     console.warn("API: " + route + ": No valid api response. Trying next api handler.", error)
                     const api = handlerQueue.shift();
-                    this.apiCall(method, endpoint, data, onSuccess, onError, api, handlerQueue)
+                    this.apiCall(method, route, data, onSuccess, onError, api, handlerQueue)
                 } else {
                     console.error("API: " + route + ": No api handler left. Api update failed. Last error: ", error)
                     if (onError) {
                         onError(error)
                     }
-                    //this.raiseError("API: " + route + ": No api update possible. Last error: ", error);
                     throw Error(error)
                 }
             }).finally(() => {

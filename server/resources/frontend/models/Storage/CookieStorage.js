@@ -13,11 +13,18 @@ export class CookieStorage extends Storage {
     makeStore() {
         return {
             load: () => {
-                return JSON.parse(this.cookieStore().load(this.storageKey(this.model().name)) ?? "{}") ?? {}
+                this.model().assignData(
+                    JSON.parse(this.cookieStore().load(
+                        this.storageKey(this.model().name())
+                    ) ?? "{}") ?? {}
+                )
             },
 
             save: (data) => {
-                this.cookieStore().save(this.storageKey(this.model().name), JSON.stringify(data))
+                this.cookieStore().save(
+                    this.storageKey(this.model().name()),
+                    JSON.stringify(data)
+                )
                 return this
             }
         }

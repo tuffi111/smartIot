@@ -32,11 +32,8 @@ export class Storage {
     }
 
     get() {
-        try {
-            return this.store().load()
-        } catch (error) {
-            return {}
-        }
+        this.store().load()
+        return this
     }
 
     set(data) {

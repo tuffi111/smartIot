@@ -6,31 +6,33 @@ export class VuexStorage extends Storage {
 
     _vuexStore
 
-    makeStore(data) {
+    makeStore() {
         return {
             load: () => {
-                this.vuexStore().state[this.storageKey()][this.model().name] = data
-                return this.vuexStore().state[this.storageKey()][this.model().name]
+                this.model().assignData(
+                    this.vuexStore().state[this.storageKey()][this.model().name()]
+                )
+                return this
             },
             save: (data, oldData) => {
-                this.vuexStore().commit(this.storageKey(this.model().name) + '/' + VuexStorage.EVENT_UPDATE, {
-                    name: this.model().name,
+                this.vuexStore().commit(this.storageKey(this.model().name()) + '/' + VuexStorage.EVENT_UPDATE, {
+                    model: this.model(),
                     data,
-                    oldData
+                    oldData,
                 }) // see also: makeStoreModule().mutations
                 return this
             }
         }
     }
 
-    makeVuexStore(data = {}) {
+    makeVuexStore() {
         const _store = useStore()
 
         if (!_store.hasModule(this.storageKey())) {
             _store.registerModule(this.storageKey(), this.makeStoreModule({}))
         }
 
-        _store.registerModule([this.storageKey(), this.name()], this.makeStoreModule(data))
+        _store.registerModule([this.storageKey(), this.model().name()], this.makeStoreModule(this.model().data()))
         return _store
     }
 
@@ -50,14 +52,15 @@ export class VuexStorage extends Storage {
             mutations: {
                 [VuexStorage.EVENT_UPDATE](state, payload) {
                     Object.assign(state, payload.data);
-                }, /**/
+                    payload.model.assignData(state)
+                }
             },
         }
     }
 
     vuexStore() {
         if (!this._vuexStore) {
-            this._vuexStore = this.makeVuexStore(this.data())
+            this._vuexStore = this.makeVuexStore()
         }
         return this._vuexStore
     }

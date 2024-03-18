@@ -6,11 +6,15 @@ export class SessionStorage extends Storage {
         const store = window?.sessionStorage;
         return {
             load: () => {
-                return JSON.parse(store.getItem(this.storageKey(this.model().name)) ?? "{}") ?? {}
+                this.model().assignData(
+                    JSON.parse(store.getItem(this.storageKey(this.model().name)) ?? "{}") ?? {}
+                )
+                return this
             },
 
             save: (data) => {
                 store.setItem(this.storageKey(this.model().name), JSON.stringify(data))
+                this.model().assignData(data)
                 return this
             }
         }
