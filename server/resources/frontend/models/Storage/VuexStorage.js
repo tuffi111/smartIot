@@ -32,7 +32,10 @@ export class VuexStorage extends Storage {
             _store.registerModule(this.storageKey(), this.makeStoreModule({}))
         }
 
-        _store.registerModule([this.storageKey(), this.model().name()], this.makeStoreModule(this.model().data()))
+        if (!_store.hasModule([this.storageKey(), this.model().name()])) {
+            _store.registerModule([this.storageKey(), this.model().name()], this.makeStoreModule(this.model().data()))
+        }
+
         return _store
     }
 
