@@ -1,5 +1,5 @@
-import {Model} from "@/models2/Model.js";
-import {VuexStorage} from "@/models2/Storage/VuexStorage.js";
+import {Model} from "@/models/Model.js";
+import {VuexStorage} from "@/models/Storage/VuexStorage.js";
 
 export class MyVueXModel extends Model {
 

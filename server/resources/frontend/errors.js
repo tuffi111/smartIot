@@ -1,11 +1,14 @@
 import {reactive} from "vue";
 
 export class Errors {
+    _errors = reactive({})
 
     constructor(fields = null) {
-        this._errors = reactive({})
-        if (fields) this.fields(fields)
-        this.reset()
+
+        //if (fields) this.fields(fields)
+
+
+        //this.reset()
     }
 
     fields(model = null) {

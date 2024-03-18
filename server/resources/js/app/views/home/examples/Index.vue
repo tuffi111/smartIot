@@ -1,44 +1,45 @@
 <script setup>
 import 'vue-json-pretty/lib/styles.css';
 import VueJsonPretty from "vue-json-pretty";
-import ModelView from "@/models/ModelView.vue";
 import {useStore} from "vuex";
-import {Model} from "@/models/Model.js";
-import {ApiDataModel} from "@app/models/examples/ApiDataModel.js";
-import {MyVueXModel} from "@app/models/examples/MyVueXModel.js";
-import {LocalDataModel} from "@app/models/examples/LocalDataModel.js";
-import {CookieDataModel} from "@app/models/examples/CookieDataModel.js";
-import {SessionDataModel} from "@app/models/examples/SessionDataModel.js";
-import ModelComponentExample from "@app/components/ModelComponentExample.vue";
-//import {useBrowserSettings} from "@app/services/browserSettings.js";
 import {onBeforeMount} from "vue";
+import {Model} from "@/models/Model";
+import {MyVueXModel} from "@app/models/examples/MyVueXModel";
+import {ApiDataModel} from "@app/models/examples/ApiDataModel";
+//import {CookieStorage} from "@/models/Storage/CookieStorage";
+import {LocalDataModel} from "@app/models/examples/LocalDataModel";
+import {CookieDataModel} from "@app/models/examples/CookieDataModel";
+import {SessionDataModel} from "@app/models/examples/SessionDataModel";
+import ModelFormExample from "@app/components/ModelFormExample.vue";
 
 const store = useStore()
-const apiModel = new ApiDataModel()
+const apiModel = new ApiDataModel();
 const vuexModel = new MyVueXModel()
-const localModel = new LocalDataModel()
+const localModel = new LocalDataModel()//.storage(new CookieStorage())
 const cookieModel = new CookieDataModel()
 const sessionModel = new SessionDataModel();
+
 const basicModel = new Model({
     theme: 'Model-theme',
     type: 7,
     address: {street: 'ggg', zip: 'ggg777', city: 'ggg777ggg'},
-    tags: {'tag-7':'tag-7', 'tag-77':'tag-77', 'tag-777':'tag-777'},
-    rights: ['read','write'],
+    tags: {'tag-7': 'tag-7', 'tag-77': 'tag-77', 'tag-777': 'tag-777'},
+    rights: ['read', 'write'],
     time: '17:00:00'
 })
 
-console.log('VUEX: store', store);
-console.log('MODELS: apiModel data', apiModel.data());
-console.log('MODELS: vuexModel data', vuexModel.data());
-console.log('MODELS: basicModel data', basicModel.data());
-console.log('MODELS: localModel data', localModel.data());
-console.log('MODELS: cookieModel data', cookieModel.data());
-console.log('MODELS: sessionModel data', sessionModel.data());
+console.log('XXX - VUEX: store', store);
+console.log('XXX - MODELS: apiModel data', apiModel.data());
+console.log('XXX - MODELS: vuexModel data', vuexModel.data());
+console.log('XXX - MODELS: basicModel data', basicModel.data());
+console.log('XXX - MODELS: localModel data', localModel.data());
+console.log('XXX - MODELS: cookieModel data', cookieModel.data());
+console.log('XXX - MODELS: sessionModel data', sessionModel.data());
 
 onBeforeMount(() => {
     //FormDataApi.fetch()
 });
+
 
 </script>
 <template>
@@ -55,47 +56,40 @@ onBeforeMount(() => {
     <br>
     Address.City: <input v-model="basicModel.data().address.city">
     <br>
-    <vue-json-pretty :data="basicModel.data()" :deep="1" />
-
-
-    <h4>Cookie Model</h4>
-    <model-view :model="cookieModel">
-        <template v-slot="{ data }">
-            Theme: <input v-model="data['theme']">
-            <br>
-            Type: <input v-model="data['type']">
-            <br>
-            Address.Street: <input v-model="data['address'].street">
-            <br>
-            Address.Zip: <input v-model="data['address'].zip">
-            <br>
-            Address.City: <input v-model="data['address'].city">
-            <br>
-            <vue-json-pretty :data="data" class="collapsed" :deep="1"/>
-        </template>
-    </model-view>
-    <vue-json-pretty :data="cookieModel.data()" :deep="0"/>
+    <vue-json-pretty :data="basicModel.data()" :deep="1"/>
 
     <hr>
     <h4>LocalStorage Model</h4>
-    <model-component-example :model="localModel"></model-component-example>
+    <model-form-example :model="localModel"></model-form-example>
     <vue-json-pretty :data="localModel.data()" :deep="1"/>
 
     <hr>
     <h4>SessionStorage Model</h4>
-    <model-component-example :model="sessionModel"></model-component-example>
+    <model-form-example :model="sessionModel"></model-form-example>
     <vue-json-pretty :data="sessionModel.data()" :deep="1"/>
 
     <hr>
-    <h4>Api Model</h4>
-    <model-component-example :model="apiModel"></model-component-example>
-    <q-btn @click="apiModel.update()">Update</q-btn><q-btn @click="apiModel.fetch()">Fetch</q-btn>
-    <vue-json-pretty :data="apiModel.data()" :deep="1"/><hr>
+    <h4>CookieStorage Model</h4>
+    <model-form-example :model="cookieModel"></model-form-example>
+    <vue-json-pretty :data="cookieModel.data()" :deep="1"/>
+
+    <hr>
+    <h4>ApiStorage Model</h4>
+    <model-form-example :model="apiModel"></model-form-example>
+    <q-btn color="secondary" @click="apiModel.load()">Load</q-btn>
+    <q-btn color="primary" @click="apiModel.save()">Save</q-btn>
+    <vue-json-pretty :data="apiModel.data()" :deep="1"/>
+
 
     <hr>
     <h4>Vuex Store Model</h4>
-    <model-component-example :model="vuexModel"></model-component-example>
-    <vue-json-pretty :data="vuexModel.data()" :deep="0"/><hr>
-    Global vuex store state: <vue-json-pretty :data="store.state" :deep="3"/><hr>
+    <model-form-example :model="vuexModel"></model-form-example>
+    <vue-json-pretty :data="vuexModel.data()" :deep="0"/>
+    <hr>
+
+    <hr>
+    <h4>Global vuex store state</h4>
+    <vue-json-pretty :data="store.state" :deep="3"/>
+    <hr>
 
 </template>

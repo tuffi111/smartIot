@@ -1,5 +1,5 @@
-import {Model} from "@/models2/Model.js";
-import {SessionStorage} from "@/models2/Storage/SessionStorage.js";
+import {Model} from "@/models/Model.js";
+import {SessionStorage} from "@/models/Storage/SessionStorage.js";
 
 export class SessionDataModel extends Model {
 

@@ -1,17 +1,24 @@
-import {reactive, watch} from "vue";
+import {reactive, ref, watch} from "vue";
+import {Storage} from "./Storage/Storage";
 import {Errors} from "@/errors.js";
 
 export class Model {
-
     static EVENT_CHANGED = 'changed'
-    _data
-    _bindings = {};
-    _autoUpdate = true
-    _errors = new Errors(this);
 
-    constructor(defaultData = {}) {
-        this._autoUpdate = this.autoUpdate()
-        this._defaultData = Object.assign({}, this.model(), defaultData)
+    _data
+    _storage
+    _modelData = {}
+    _changed = false
+    _autoLoad = true
+    _autoSave = true
+    _bindings = {};
+    _errors = new Errors(this);
+    _loading = ref(false)
+
+    constructor(modelData = undefined) {
+        if (modelData !== undefined) {
+            this._modelData = modelData
+        }
     }
 
     name() {
@@ -22,100 +29,136 @@ export class Model {
         return {}
     }
 
-    emptyModel(setTo = null) {
-        let attributes = {}
-
-        Object.objectDeepKeys(this.model()).forEach((key) => {
-            attributes[key] = setTo
-        })
-
-        return attributes
+    makeData() {
+        return reactive(Object.assign({},
+            this.model(),
+            this._modelData
+        ))
     }
 
-    autoUpdate() {
-        return this._autoUpdate
+    assignData(data) {
+        Object.assign(this.data(), data)
     }
 
-
-    makeData(set = {}) {
-        return reactive(set)
+    makeStorage() {
+        return new Storage()
     }
 
-    data(keyChain = null) {
-        if (this._data === undefined) {
-            this._data = this.makeData(this._defaultData);
+    has(key) {
+        return key in this.data()
+    }
 
-            watch(this._data, (newV, oldV) => {
-                this.raise(Model.EVENT_CHANGED, newV, oldV)
-            })
-
-            this.raise(Model.EVENT_CHANGED, this._data)
+    get(key = null, dflt = undefined) {
+        if (key) {
+            if (!this.has(key) && dflt !== undefined) {
+                if (dflt instanceof Function) {
+                    dflt = dflt()
+                }
+                return dflt
+            }
+            return this.data()[key]
         }
 
-        if (keyChain) {
-            return this._data[keyChain]
+        return this.data()
+    }
+
+    set(keyOrData, value = undefined) {
+        this.changed(true)
+        if (value === undefined) {
+            this.assignData(keyOrData)
+        } else {
+            this.assignData({[keyOrData]: value})
+        }
+
+        return this
+    }
+
+
+    load() {
+        this.storage().get()
+        this.changed(false)
+        return this
+    }
+
+    save(force = false) {
+        if (force || this.changed()) {
+            this.storage().set(this.data())
+        }
+        this.changed(false)
+        return this
+    }
+
+
+    autoLoad(set = null) {
+        if (set === null) {
+            return this._autoLoad
+        }
+        this._autoLoad = set
+        return this
+    }
+
+    autoSave(set = null) {
+        if (set === null) {
+            return this._autoSave
+        }
+        this._autoSave = set
+        return this
+    }
+
+    changed(set = null) {
+        if (set === null) {
+            return this._changed
+        }
+        this._changed = set
+        return this
+    }
+
+    onChange(newValue, oldValue) {
+        this.changed(true)
+        this.raise(Model.EVENT_CHANGED, newValue, oldValue)
+        if (this.autoSave()) {
+            this.storage().set(newValue, oldValue)
+        }
+    }
+
+
+    data(set = null) {
+        if (set) {
+            this._data = set
+            return this
+        }
+
+        if (!this._data) {
+            this._data = this.makeData()
+            if (this.autoLoad()) {
+                this.load()
+            }
+
+            watch(this._data, (newValue, oldValue) => {
+                this.onChange(newValue, oldValue)
+            })
         }
 
         return this._data
     }
 
-    has(keyChain) {
-        return keyChain in this.data()
-    }
 
-    //get()
-    //get( keyChain ) // wo/ default should throw an error if keyChain not exists
-    //get( keyChain, default )
-    get(keyChain = null, preset = undefined) {
-
-        if (keyChain) {
-            if (this.has(keyChain)) {
-                return this.data()[keyChain]
-            }
-
-            if (preset instanceof Function) {
-                preset = preset.call(this, keyChain)
-            }
-
-            return preset;
-        }
-
-        return this.data();
-    }
-
-    //set(data)
-    //set(keyChain, value)
-    set(dataOrKeyChain, value = undefined) {
-        if (value === undefined) {
-            Object.assign(this.data(), dataOrKeyChain)
-            this.resetAutoUpdate()
+    storage(set = null) {
+        if (set) {
+            this._storage = set
+            this._storage.model(this)
             return this
         }
-        this.data()[dataOrKeyChain] = value;
-        this.resetAutoUpdate()
-        return this
-    }
 
-    withAutoUpdate(set = null) {
-        if (set === null) {
-            return this._autoUpdate
+        if (!this._storage) {
+            this.storage(this.makeStorage())
+            this.storage().model(this)
+            this.storage().bind(Storage.EVENT_CHANGED, () => {
+
+            })
         }
-        this._autoUpdate = !!set
-        return this
-    }
 
-
-    resetAutoUpdate(set = null) {
-        if (set === null) {
-            this.withAutoUpdate(this._resetAutoUpdate);
-        }
-        this._resetAutoUpdate = set
-        return this
-    }
-
-    withoutAutoUpdate(set = true) {
-        this.withAutoUpdate(!set)
-        return this
+        return this._storage
     }
 
     raise(event, data, oldData) {
@@ -157,5 +200,14 @@ export class Model {
             return this
         }
         return this._errors
+    }
+
+    loading(set = null) {
+        if (set === null) {
+            return this._loading.value
+        }
+
+        this._loading.value = !!set
+        return this
     }
 }

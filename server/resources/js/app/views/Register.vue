@@ -1,7 +1,7 @@
 <script setup>
 import 'vue-json-pretty/lib/styles.css';
 import Default from "@app/layouts/Default.vue";
-import {RegisterModel} from "@app/models/RegisterModel";
+import {RegisterModel} from "@app/models/auth/RegisterModel.js";
 import {useHttp} from '@/requests'
 import RegisterForm from "@app/components/forms/auth/RegisterForm.vue";
 import {authData} from "@/auth.js";

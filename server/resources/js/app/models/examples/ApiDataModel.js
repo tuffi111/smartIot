@@ -1,5 +1,5 @@
-import {Model} from "@/models2/Model.js";
-import {ApiStorage} from "@/models2/Storage/ApiStorage.js";
+import {Model} from "@/models/Model.js";
+import {ApiStorage} from "@/models/Storage/ApiStorage.js";
 //import {apiRoute} from "@/backend-router.js";
 
 export class ApiDataModel extends Model {
@@ -10,14 +10,18 @@ export class ApiDataModel extends Model {
 
     makeStorage() {
         return new ApiStorage()
-        /*.routes({
-            fetch: apiRoute('api.models.fetch'),
-            update: apiRoute('api.models.update'),
-        })/**/
+            /*.routes({
+                [ApiStorage.ROUTE_FETCH]: apiRoute('api.models.fetch'),
+                [ApiStorage.ROUTE_UPDATE]: apiRoute('api.models.update'),
+            })/**/
     }
 
-    autoUpdate() {
+    autoSave() {
         return false
+    }
+
+    autoLoad() {
+        return true
     }
 
     model() {

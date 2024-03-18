@@ -6,15 +6,17 @@ export class VuexStorage extends Storage {
 
     _vuexStore
 
-    makeStore(name, data) {
+    makeStore(data) {
         return {
-            load: (name) => {
-                this.vuexStore().state[this.storageKey()][name] = data
-                return this.vuexStore().state[this.storageKey()][name]
+            load: () => {
+                this.vuexStore().state[this.storageKey()][this.model().name] = data
+                return this.vuexStore().state[this.storageKey()][this.model().name]
             },
-            save: (name, data, oldData) => {
-                this.vuexStore().commit(this.storageKey(name) + '/' + VuexStorage.EVENT_UPDATE, {
-                    name, data, oldData
+            save: (data, oldData) => {
+                this.vuexStore().commit(this.storageKey(this.model().name) + '/' + VuexStorage.EVENT_UPDATE, {
+                    name: this.model().name,
+                    data,
+                    oldData
                 }) // see also: makeStoreModule().mutations
                 return this
             }

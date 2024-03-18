@@ -35,7 +35,7 @@ class ModelController extends ApiController
 
     function update(Request $request, string $model): JsonResponse
     {
-        //dd( $request->json() );
+        //dd( $request->json(), $model );
         return new JsonResponse($request->merge($this->data));
     }
 }

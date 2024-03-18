@@ -1,5 +1,5 @@
-import {Model} from "@/models2/Model.js";
-import {LocalStorage} from "@/models2/Storage/LocalStorage.js";
+import {Model} from "@/models/Model.js";
+import {LocalStorage} from "@/models/Storage/LocalStorage.js";
 
 export class LocalDataModel extends Model {
 

@@ -1,5 +1,5 @@
-import {Model} from "@/models2/Model.js";
-import {CookieStorage} from "@/models2/Storage/CookieStorage.js";
+import {Model} from "@/models/Model.js";
+import {CookieStorage} from "@/models/Storage/CookieStorage.js";
 
 export class CookieDataModel extends Model{
 

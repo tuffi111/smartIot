@@ -19,13 +19,15 @@ export class RegisterModel extends Model {
         }
     }
 
-    _validations = {
-        email: [required(), email(), minMaxLength()],
-        firstname: [required(), minMaxLength()],
-        lastname: [required(), minMaxLength()],
-        password: [required(), validatePassword()],
-        password_confirmation: [required(), minMaxLength(), equals(this.data('password'), 'The confirmation does not match.')],
-        accepted: [required(), contains('agb', 'AGB should be accepted')],
+    validations() {
+        return {
+            email: [required(), email(), minMaxLength()],
+            firstname: [required(), minMaxLength()],
+            lastname: [required(), minMaxLength()],
+            password: [required(), validatePassword()],
+            password_confirmation: [required(), minMaxLength(), equals(this.data('password'), 'The confirmation does not match.')],
+            accepted: [required(), contains('agb', 'AGB should be accepted')],
+        }
     }
 
 }
