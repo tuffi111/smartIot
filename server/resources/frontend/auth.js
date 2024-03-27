@@ -7,13 +7,25 @@ import {resolveRoute} from "@/backend-router.js";
 
 const _authData = new AuthModel()
 const _authUser = new UserModel()
-const _permissions = reactive({})
-const _permissionsDefault = {isAuth: false, user: undefined, permissions: {rights: [], roles: [], routes: []}}
+const _permissions = ref({})
+const _permissionsDefault = {guest: true}
 const isLoading = ref(false)
 
 
+export function permissions() {
+    if (!isLoading.value && !Object.keys(_permissions).length) {
+        _permissions.value = _permissionsDefault
+        refresh()
+    }
+    return _permissions
+}
+
 function updatePermissions(data) {
-    Object.assign(_permissions, _permissionsDefault, data)
+    _permissions.value = Object.assign(_permissions.value, data)
+}
+
+function resetPermissions(data = {}) {
+    _permissions.value = data
 }
 
 
@@ -21,9 +33,6 @@ export {
     isLoading
 }
 
-
-export function session() {
-}
 
 export function authData() {
     return _authData
@@ -36,26 +45,31 @@ export function user() {
 export async function login(loginData, onSuccess, onError) {
     return useHttp()(resolveRoute('auth.login'), {method: "POST", data: loginData})
         .then((response) => {
-            return response.data
+            if (response['data'] && response['data']['token']) {
+                return response['data']
+            }
+
+            Promise.reject('Unexpected response')
         })
         .then((responseData) => {
             authData()
                 .maxAge(loginData['stayAuth'] ? 7 * 86400 : null)
                 .set('token', responseData.token)
 
-            updatePermissions(responseData.data)
+            resetPermissions(responseData.data ?? {})
 
             if (onSuccess) {
                 onSuccess(responseData)
             }
 
             return responseData
+
         })
         .catch((error) => {
-            authData().remove()
-            updatePermissions({isAuth: false})
+            authData().delete()
+            resetPermissions()
 
-            if(onError){
+            if (onError) {
                 onError(error)
             }
 
@@ -67,8 +81,6 @@ export function logout(onSuccess = null, onError = null, onFinally = null) {
     return useApi()(resolveRoute('api.auth.logout'))
         .then((response) => {
             if (response['data'] && response['data']['state'] === 'ok') {
-                refresh(response.data)
-
                 if (onSuccess) {
                     onSuccess(response)
                 }
@@ -84,11 +96,11 @@ export function logout(onSuccess = null, onError = null, onFinally = null) {
                 }
                 return error
             }
-            console.log('Already logged out')
+            console.log('Already logged out', error)
         })
         .finally(() => {
-            authData().remove()
-            updatePermissions({isAuth: false})
+            authData().delete()
+            resetPermissions()
             if (onFinally) {
                 onFinally()
             }
@@ -97,6 +109,7 @@ export function logout(onSuccess = null, onError = null, onFinally = null) {
 
 
 export function can(rights) {
+
     if (permissions()['permissions'] && permissions()['permissions']['rights']) {
         if (!(rights instanceof Array)) {
             rights = [rights]
@@ -108,12 +121,13 @@ export function can(rights) {
                 return true
             }
         }
-    }
+    }/**/
 
     return false
 }
 
 export function has(roles) {
+
     if (permissions()['permissions'] && permissions()['permissions']['roles']) {
         if (!(roles instanceof Array)) {
             roles = [roles]
@@ -125,7 +139,7 @@ export function has(roles) {
                 return true
             }
         }
-    }
+    }/**/
 
     return false
 }
@@ -136,12 +150,12 @@ export async function refresh(set = null) {
         return useApi()('permissions')
             .then((response) => {
                 //console.log('================ CREATE PERMISSIONS ================', response.data.data)
-                updatePermissions(response.data.data)
+                resetPermissions(response.data.data)
                 return response
             })
             .catch((error) => {
-                //console.log('================ CREATE PERMISSIONS ================', error)
-                updatePermissions({isAuth: false})
+                //console.log('================ CREATE PERMISSIONS by error ================', error)
+                resetPermissions()
                 return error
             })
             .finally(() => {
@@ -151,19 +165,10 @@ export async function refresh(set = null) {
 
     if (set) {
         //console.log('================ CREATE PERMISSIONS ================', set)
-        updatePermissions(set)
+        resetPermissions(set)
     }
 
     return this
-}
-
-
-export function permissions() {
-    if (!isLoading.value && !('user' in _permissions)) {
-        Object.assign(_permissions, _permissionsDefault)
-        refresh()
-    }
-    return _permissions
 }
 
 export function isAuth() {
@@ -181,7 +186,7 @@ export async function canAccess(auth) {
         auth = [auth]
     }
 
-    /**/
+
     let resolvers = [];
     for (let i in auth) {
         resolvers.push(auth[i].call());
@@ -194,5 +199,9 @@ export async function canAccess(auth) {
         .catch(() => {
             return false;
         })
+
+     /**/
+
+    return false;
 }
 

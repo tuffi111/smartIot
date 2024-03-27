@@ -1,74 +1,52 @@
-
 export class Cookie {
-    _maxAge = 3 * 3600 // number < 1: immediately; seconds: *1; minutes: *60; hours: *3600; days: 86400;
-    _expires // = 3 // days
+    _maxAge = 3 * 3600 // number < 1: immediately; seconds: *1; minutes: *60; hours: *3600; days: *86400;
+    _expires //= Date.now() // Date
+    _path = '/'
 
     load(name) {
-        let nameEQ = name + "=";
-        let ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        const cookieData = new RegExp("(?<=" + name + "=)[^;]+").exec(document.cookie)
+        if (cookieData) {
+            return cookieData[0]
         }
-        return null;
+        return null
+    }
+
+    write(name, value, maxAge = null, expires = null, path = null, domain = null, sameSite = null, secure = null) {
+        document.cookie = "{name}={value}; {maxAge} {expires} Path={path}; Domain={domain}; SameSite={sameSite}; {secure}".format({
+            name,
+            value,
+            maxAge: maxAge ? "Max-Age={0};".format(maxAge) : '',
+            expires: expires ? "expires={0};".format(expires.toUTCString()) : '',
+            path: path ?? this.path(),
+            domain: domain ?? window.location.hostname,
+            sameSite: sameSite ?? process.env.NODE_ENV === 'development' ? 'lax' : 'Strict',
+            secure: secure ?? process.env.NODE_ENV === 'development' ? '' : 'Secure'
+        })
     }
 
     save(name, value) {
-        let maxAge = ''
-        const maxAgeVal = this.maxAge()
-        if (maxAgeVal !== null) {
-            maxAge = "Max-Age={0};".format(maxAgeVal)
-        }
-
-        let expires = ""
-        const date = this.expires()
-        if (date) {
-            expires = "expires={0};".format(date.toUTCString())
-        }
-
-        document.cookie = "{0}={1}; {2} {3} Path={4}; Domain={5}; SameSite={6}; {7}".format(
-            name,                                                       // 0
-            value || "",                                                // 1
-            maxAge,                                                     // 2
-            expires,                                                    // 3
-            this.path(),                                                // 4
-            window.location.hostname,                                   // 5
-            process.env.NODE_ENV === 'development' ? 'lax' : 'Strict',  // 6
-            process.env.NODE_ENV === 'development' ? '' : 'Secure'      // 7
-        )
+        this.write(name, value || '', this.maxAge(), this.expires())
     }
 
     delete(name) {
-        document.cookie = "{0}={1}; Path={2}; Domain={3}; SameSite={4}; {5}".format(
-            name,                                                       // 0
-            "",                                                         // 1
-            this.path(),                                                // 2
-            window.location.hostname,                                   // 3
-            process.env.NODE_ENV === 'development' ? 'lax' : 'Strict',  // 4
-        )
+        this.write(name, '', '0')
     }
 
-    expires(set = null) {
-        if (set === null) {
-            if (this._expires) {
-                let date = new Date()
-                date.setTime(date.getTime() + (this._expires * 24 * 60 * 60 * 1000))
-                return date
-            }
-            return null
+    expires(setDate = null) {
+        if (setDate === null) {
+            return this._expires
         }
 
-        this._expires = set
+        this._expires = setDate
         return this
     }
 
-    maxAge(set = undefined) {
-        if (set === undefined) {
+    maxAge(setSeconds = undefined) {
+        if (setSeconds === undefined) {
             return this._maxAge
         }
 
-        this._maxAge = set
+        this._maxAge = setSeconds
         return this
     }
 

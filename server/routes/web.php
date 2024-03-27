@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ForceJsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\App as AppController;
 
@@ -17,6 +18,11 @@ use App\Http\Controllers\App as AppController;
 
 //Route::middleware(Language::class)->group(function () {
 Route::fallback([AppController::class, 'index'])->name('index');
+
+
+Route::get('authtest', function (\Illuminate\Http\Request $request ){
+    dd( Auth::user() );
+});
 
 // auth
 Route::name('auth.')

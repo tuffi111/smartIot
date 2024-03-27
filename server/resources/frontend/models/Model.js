@@ -7,7 +7,7 @@ export class Model {
 
     _data
     _storage
-    _modelData = {}
+    _modelData
     _changed = false
     _autoLoad = true
     _autoSave = true
@@ -15,10 +15,8 @@ export class Model {
     _errors = new Errors(this);
     _loading = ref(false)
 
-    constructor(modelData = undefined) {
-        if (modelData !== undefined) {
-            this._modelData = modelData
-        }
+    constructor(modelData = {}) {
+        this._modelData = modelData
     }
 
     name() {

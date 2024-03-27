@@ -1,15 +1,28 @@
-String.format = String.format ||
+String.format =
     function (str) {
         "use strict";
-        if (arguments.length) {
-            let t = typeof arguments[1];
-            let key;
-            let args = ("string" === t || "number" === t) ?
-                Array.prototype.slice.call(arguments, 1)
-                : arguments[1];
+        if (
+            arguments
+            && arguments.length
+            && arguments.length > 1
+            && arguments[1]
+        ) {
+            let args = []
 
-            for (key in args) {
-                str = str.replace(new RegExp("\\{" + key + "\\}", "gi"), args[key]);
+            if (
+                typeof arguments[1] === 'object'
+                && !Array.isArray(arguments[1])
+            ) {
+                args = arguments[1]
+            } else {
+                let t = typeof arguments[1];
+                args = ("string" === t || "number" === t) ?
+                    Array.prototype.slice.call(arguments, 1)
+                    : arguments[1];
+            }
+
+            for (let key in args) {
+                str = str.replace(new RegExp("\\{\\s*?" + key + "\\s*?\\}", 'g'), args[key])
             }
         }
 

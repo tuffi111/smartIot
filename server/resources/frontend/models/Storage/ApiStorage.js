@@ -20,54 +20,44 @@ export class ApiStorage extends Storage {
         return [useApi()]
     }
 
-    route(action, name = null) {
-        return this.escapeRoute(resolveRoute(this.routes()[action].name)) + '/' + name ?? this.model().name()
+    makeStore() {
+        return {
+            load: () => {
+                const method = this.method(ApiStorage.ROUTE_FETCH)
+                const route = this.route(ApiStorage.ROUTE_FETCH, this.model().name())
+                return this.apiCall(method, route)
+                    .then((data) => {
+                        console.table(data)
+                        this.model().assignData(data)
+                        return data
+                    })
+                    .catch((error) => {
+                        //console.warn('API-GET-CALL-ERROR:', error)
+                        return error
+                    })
+            },
+            save: (data) => {
+                const method = this.method(ApiStorage.ROUTE_UPDATE)
+                const route = this.route(ApiStorage.ROUTE_UPDATE, this.model().name())
+                return this.apiCall(method, route, data)
+                    .then((data) => {
+                        this.model().assignData(data)
+                        return data
+                    })
+                    .catch((error) => {
+                        //console.warn('API-SAVE-CALL-ERROR:', error)
+                        return error
+                    })
+            }
+        }
     }
 
     method(action) {
         return this.routes()[action].methods[0].toUpperCase()
     }
 
-    makeStore() {
-        return {
-            load: () => {
-                const method = this.method(ApiStorage.ROUTE_FETCH)
-                const route = this.route(ApiStorage.ROUTE_FETCH, this.model().name())
-                console.info('API-GET-CALL:', method, route)
-                return this.apiCall(method, route)
-                    .then((data) => {
-                        console.log('API-GET-CALL-RESPONSE:', data)
-                        console.table(data)
-                        this.model().assignData(data)
-                    })
-                    .catch((error) => {
-                        console.warn('API-GET-CALL-ERROR:', error)
-                    })
-            },
-            save: (data) => {
-                const method = this.method(ApiStorage.ROUTE_UPDATE)
-                const route = this.route(ApiStorage.ROUTE_UPDATE, this.model().name())
-                console.info('API-SET-CALL:', method, route, data)
-                return this.apiCall(method, route, data)
-                    .then((data) => {
-                        console.log('API-SAVE-CALL-RESPONSE:', data)
-                        this.model().assignData(data)
-                    })
-                    .catch((error) => {
-                        console.warn('API-SAVE-CALL-ERROR:', error)
-                    })
-            }
-        }
-    }
-
-    get() {
-        this.store().load()
-        return this
-    }
-
-    set(data) {
-        this.store().save(data)
-        return this
+    route(action, name = null) {
+        return this.escapeRoute(resolveRoute(this.routes()[action].name)) + '/' + name ?? this.model().name()
     }
 
     routes(set = null) {
@@ -85,7 +75,7 @@ export class ApiStorage extends Storage {
     }
 
 
-    apiCall = async (method, route, data = {}, onSuccess = null, onError = null, api = null, handlerQueue = null) => {
+    apiCall = async (method, route, data = {}, api = null, handlerQueue = null) => {
         if (!handlerQueue) {
             handlerQueue = Array.from(this.apiHandler())
         }
@@ -95,7 +85,6 @@ export class ApiStorage extends Storage {
         }
 
         this.loading(true)
-        //const route = this.makeRoute(endpoint);
         return api(route, Object.assign({
             method,
             data
@@ -104,21 +93,15 @@ export class ApiStorage extends Storage {
                 return response.data
             })
             .then((data) => {
-                if (onSuccess) {
-                    onSuccess(data)
-                }
                 return data
             })
             .catch((error) => {
                 if (handlerQueue.length) {
                     console.warn("API: " + route + ": No valid api response. Trying next api handler.", error)
                     const api = handlerQueue.shift();
-                    this.apiCall(method, route, data, onSuccess, onError, api, handlerQueue)
+                    this.apiCall(method, route, data, api, handlerQueue)
                 } else {
                     console.error("API: " + route + ": No api handler left. Api update failed. Last error: ", error)
-                    if (onError) {
-                        onError(error)
-                    }
                     throw Error(error)
                 }
             }).finally(() => {

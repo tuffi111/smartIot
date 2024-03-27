@@ -106,6 +106,16 @@ function resizeDrawer(ev) {
 }
 
 async function sendLogout() {
+/*
+    logout().then((data)=>{
+        console.debug('Logout successful', data);
+    }).catch((error)=>{
+        console.error('Logout error', error);
+    }).finally(()=>{
+        router.push('/login')
+    })
+/**/
+
     logout((data) => {
             console.debug('Logout successful', data);
         },
@@ -114,7 +124,7 @@ async function sendLogout() {
         },
         () => {
             router.push('/login')
-        })
+        })/**/
 }
 
 onMounted(() => {
@@ -207,6 +217,7 @@ onMounted(() => {
 
                 <div v-else>
                     <q-btn label="Login" to="/login" stretch flat/>
+                    <q-btn label="Logout" @click="sendLogout" stretch flat/>
                     <q-btn label="Register" to="/register" stretch flat/>
                 </div>
             </q-toolbar>

@@ -13,11 +13,17 @@ export class CookieStorage extends Storage {
     makeStore() {
         return {
             load: () => {
-                this.model().assignData(
-                    JSON.parse(this.cookieStore().load(
-                        this.storageKey(this.model().name())
-                    ) ?? "{}") ?? {}
-                )
+                let data = this.cookieStore().load(this.storageKey(this.model().name()))
+                if (data) {
+                    try {
+                        data = JSON.parse(data)
+                    } catch (error) {
+                        console.debug('Unsupported cookie data', error)
+                        data = null
+                    }
+                }
+
+                this.model().assignData(data??{})
             },
 
             save: (data) => {
@@ -30,23 +36,23 @@ export class CookieStorage extends Storage {
         }
     }
 
-    maxAge(...args) {
-        this.cookieStore().maxAge(...args)
+    maxAge(setSeconds) {
+        this.cookieStore().maxAge(setSeconds)
         return this
     }
 
-    expires(...args) {
-        this.cookieStore().expires(...args)
+    expires(setDate) {
+        this.cookieStore().expires(setDate)
         return this
     }
 
-    path(...args) {
-        this.cookieStore().path(...args)
+    path(set) {
+        this.cookieStore().path(set)
         return this
     }
 
-    delete(...args) {
-        this.cookieStore().delete(...args)
+    delete() {
+        this.cookieStore().delete(this.storageKey(this.model().name()))
         return this
     }
 
@@ -58,6 +64,8 @@ export class CookieStorage extends Storage {
 
         if (!this._cookieStore) {
             this._cookieStore = this.makeCookieStore()
+            // todo: implement cookie watcher/onChange handler
+            // not working: document.cookies.onChanged.addListener((changeInfo) => {})
         }
 
         return this._cookieStore

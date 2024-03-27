@@ -11,6 +11,8 @@ import {LocalDataModel} from "@app/models/examples/LocalDataModel";
 import {CookieDataModel} from "@app/models/examples/CookieDataModel";
 import {SessionDataModel} from "@app/models/examples/SessionDataModel";
 import ModelFormExample from "@app/components/ModelFormExample.vue";
+import {ionRefreshCircle} from "@quasar/extras/ionicons-v7";
+import {permissions} from "@/auth.js";
 
 const store = useStore()
 const apiModel = new ApiDataModel();
@@ -43,9 +45,15 @@ onBeforeMount(() => {
 
 </script>
 <template>
-    <h2>Models</h2>
+    <h2>Permissions</h2>
 
-    <h4>Basic Model</h4>
+    <input :value="permissions()['notifications']">
+
+    {{ permissions() }}
+
+    <h2>Storages</h2>
+
+    <h4>Static (no storage)</h4>
     Theme: <input v-model="basicModel.data().theme">
     <br>
     Type: <input v-model="basicModel.data().type">
@@ -59,30 +67,32 @@ onBeforeMount(() => {
     <vue-json-pretty :data="basicModel.data()" :deep="1"/>
 
     <hr>
-    <h4>LocalStorage Model</h4>
+    <h4>LocalStorage</h4>
     <model-form-example :model="localModel"></model-form-example>
     <vue-json-pretty :data="localModel.data()" :deep="1"/>
 
     <hr>
-    <h4>SessionStorage Model</h4>
+    <h4>SessionStorage</h4>
     <model-form-example :model="sessionModel"></model-form-example>
     <vue-json-pretty :data="sessionModel.data()" :deep="1"/>
 
     <hr>
-    <h4>CookieStorage Model</h4>
+    <h4>CookieStorage</h4>
     <model-form-example :model="cookieModel"></model-form-example>
     <vue-json-pretty :data="cookieModel.data()" :deep="1"/>
 
     <hr>
-    <h4>ApiStorage Model</h4>
+    <h4>ApiStorage</h4>
     <model-form-example :model="apiModel"></model-form-example>
     <q-btn color="secondary" @click="apiModel.load()">Load</q-btn>
-    <q-btn color="primary" @click="apiModel.save()">Save</q-btn>
+    <q-btn color="primary" @click="apiModel.save()" :icon-right="apiModel.loading()?ionRefreshCircle:undefined" :disable="apiModel.loading()">
+        Save
+    </q-btn>
     <vue-json-pretty :data="apiModel.data()" :deep="1"/>
 
 
     <hr>
-    <h4>Vuex Store Model</h4>
+    <h4>VuexStorage</h4>
     <model-form-example :model="vuexModel"></model-form-example>
     <vue-json-pretty :data="vuexModel.data()" :deep="0"/>
     <hr>

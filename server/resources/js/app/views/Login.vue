@@ -3,7 +3,7 @@ import 'vue-json-pretty/lib/styles.css';
 import Default from "@app/layouts/Default.vue";
 import {LoginModel} from "@app/models/auth/LoginModel";
 import {useRouter} from 'vue-router';
-import {isAuth, login, logout, permissions, user, refresh, authData} from "@/auth";
+import {isAuth, login, user, refresh, authData} from "@/auth";
 import LoginForm from "@app/components/forms/auth/LoginForm.vue";
 
 //const FormData = new LoginModel()
@@ -25,17 +25,6 @@ const sendLogin = (e) => {
         })
 }
 
-const sendLogout = () => {
-    logout()
-}
-
-const toggleAuth = () => {
-    isAuth(!isAuth())
-}
-
-const getPermissions = () => {
-    refresh()
-}
 
 
 </script>

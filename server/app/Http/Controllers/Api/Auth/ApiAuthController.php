@@ -44,7 +44,7 @@ class ApiAuthController extends Controller
         Auth::user()->token()->revoke();
         Auth::guard('web')->logout();
 
-        return AuthResource::byUser(Auth::user())->additional([
+        return AuthResource::byUser(null)->additional([
             'state' => 'ok',
         ]);
     }

@@ -2,18 +2,20 @@
 
 namespace App\Http\Resources;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AuthResource extends JsonResource
 {
 
-    static function byUser($user)
+    static function byUser(User|null $user): self
     {
         return new static([
-            'isAuth' => !!$user,
-            'user' => $user??null,
-            'permissions' => $user?$user->permissions()->get():[],
+            'auth' => (($user) ? [
+                'user' => $user,
+                'permissions' => $user->permissions()->get(),
+            ] : null)
         ]);
     }
 

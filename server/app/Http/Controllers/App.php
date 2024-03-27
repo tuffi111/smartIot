@@ -11,6 +11,7 @@ class App extends Controller
 {
     function index(Request $request): View
     {
-        return view('index', ['auth' => AuthResource::byUser($request->user())->toJson() ]);
+        return view('index', ['auth' => AuthResource::byUser(Auth::user())]);
+        //return view('index', ['auth' => AuthResource::byUser($request->user())->toJson() ]);
     }
 }
