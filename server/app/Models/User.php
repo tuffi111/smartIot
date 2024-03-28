@@ -13,6 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @method static create(array $array)
+ * @mixin IdeHelperUser
  */
 class User extends Authenticatable
 {

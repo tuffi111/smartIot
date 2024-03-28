@@ -6,56 +6,95 @@ use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModel extends Model
 {
-    protected string $prefix;
+    static protected $withDatabaseName = false;
 
-    public function __construct(array $attributes = [])
+    static function withDb(bool $set = true): self
     {
-        if (isset($this->prefix)) {
-            $this->setTable($this->prefix . $this->getTable());
-        }
-
-        parent::__construct($attributes);
+        static::$withDatabaseName = $set;
+        return new static;
     }
 
-    public static function table(): string
-    {
-        return (new static())->getTable();
-    }
-
-    public static function key(): string
-    {
-        return (new static())->getKeyName();
-    }
-
-    public static function attr(string $prp): string
-    {
-        return static::table() . '.' . $prp;
-    }
-
-    public static function primary(): string
-    {
-        return static::attr(static::key());
-    }
-
-
-    /*
-
-    Get index sizes culminated by table
-        SELECT database_name, table_name, #index_name,
-        SUM(stat_value) AS stat_value, ROUND(SUM(stat_value) * @@innodb_page_size / 1024 / 1024, 2) index_size_in_mb
-        FROM mysql.innodb_index_stats
-        WHERE stat_name = 'size' AND index_name != 'PRIMARY'
-        GROUP BY database_name, table_name, database_name
-        ORDER BY index_size_in_mb DESC;
-
-     Get index sizes for each index
-        SELECT database_name, table_name, index_name, stat_value,
-        ROUND(stat_value * @@innodb_page_size / 1024 / 1024, 2) index_size_in_mb
-        FROM mysql.innodb_index_stats
-        WHERE stat_name = 'size' AND index_name != 'PRIMARY'
-        ORDER BY database_name, index_size_in_mb DESC;
-
-
-
+    /**
+     * Get the table name of Model.
+     *
+     * @param string $enclose
+     * @return string
      */
+    static function table(string $enclose = ''): string
+    {
+        $me = (new static);
+        return static::withDatabaseName($me, $enclose, '.')
+            . static::formatTableName($me->getTable(), $enclose);
+    }
+
+    /**
+     * Get primary key name.
+     *
+     * @param string $enclose
+     * @return string
+     */
+    static function keyName(string $enclose = ''): string
+    {
+        $me = (new static);
+        static::$withDatabaseName = false;
+        return static::formatTableName($me->getKeyName(), $enclose);
+    }
+
+    /**
+     * Get full qualified primary key name.
+     * Example:
+     *  Model::primaryKey() => `table`.`primaryAttribute`
+     *
+     * @param string $enclose
+     * @return string
+     */
+    static function primaryKey(string $enclose = '`'): string
+    {
+        $db = static::$withDatabaseName;
+        $key = static::keyName();
+        static::$withDatabaseName = $db;
+        $result = static::attr($key, $enclose);
+        static::$withDatabaseName = false;
+        return $result;
+    }
+
+    /**
+     *  Get full qualified attribute.
+     *  Example:
+     *   Model::attr('anAttribute') => `table`.`anAttribute`
+     *   Model::withDatabase()->attr('anAttribute') => `db`.`table`.`anAttribute`
+     *
+     * @param string $property
+     * @param string $enclose
+     * @return string
+     */
+    static function attr(string $property, string $enclose = '`'): string
+    {
+        return sprintf('%s.%s%s%s', static::table($enclose), $enclose, $property, $enclose);
+    }
+
+    private static function formatTableName(string $value, string $enclose = '', string $suffix = ''): string
+    {
+        return sprintf('%s%s%s%s', $enclose, $value, $enclose, $suffix);
+    }
+
+    /**
+     * @param Model $model
+     * @param string $enclose
+     * @param string $suffix
+     * @param string $db
+     * @return string
+     */
+    private static function withDatabaseName(
+        Model $model,
+        string $enclose = '',
+        string $suffix = '',
+        string $db = ''
+    ): string {
+        if (static::$withDatabaseName) {
+            $db = static::formatTableName($model->getConnection()->getDatabaseName(), $enclose, $suffix);
+            static::$withDatabaseName = false;
+        }
+        return $db;
+    }
 }

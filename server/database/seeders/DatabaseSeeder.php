@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Hierarchy;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
@@ -44,8 +45,72 @@ class DatabaseSeeder extends Seeder
             self::$counter++;
             return [
                 'name' => 'Test User' . self::$counter,
-                'email' => 'test' . self::$counter . '@example.com',
+                'email' => 'test' . self::$counter . '@app.local',
             ];
         });
+
+
+
+
+        /*
+        id  |   left   |   right    | name
+        ----+-----------------------------------------
+        1   |   1       |   18      | ROOT
+        2   |   2       |    3      | Company A
+        3   |   4       |    7      | Company B
+        4   |   5       |    6      | Company B.1
+        5   |   8       |   17      | Company C
+        6   |   9       |   16      | Company C.1
+        7   |   10      |   11      | Company C.1.1
+        8   |   12      |   15      | Company C.1.2
+        9   |   13      |   14      | Company C.1.2.1
+        /**/
+
+        Hierarchy::insert([[
+            Hierarchy::PRP_NAME => 'ROOT',
+            Hierarchy::PRP_ID => 1,
+            Hierarchy::PRP_LEFT => 1,
+            Hierarchy::PRP_RIGHT => 18,
+        ],[
+            Hierarchy::PRP_NAME => 'Company A',
+            Hierarchy::PRP_ID => 2,
+            Hierarchy::PRP_LEFT => 2,
+            Hierarchy::PRP_RIGHT => 3,
+        ],[
+            Hierarchy::PRP_NAME => 'Company B',
+            Hierarchy::PRP_ID => 3,
+            Hierarchy::PRP_LEFT => 4,
+            Hierarchy::PRP_RIGHT => 7,
+        ],[
+            Hierarchy::PRP_NAME => 'Company B.1',
+            Hierarchy::PRP_ID => 4,
+            Hierarchy::PRP_LEFT => 5,
+            Hierarchy::PRP_RIGHT => 6,
+        ],[
+            Hierarchy::PRP_NAME => 'Company C',
+            Hierarchy::PRP_ID => 5,
+            Hierarchy::PRP_LEFT => 8,
+            Hierarchy::PRP_RIGHT => 17,
+        ],[
+            Hierarchy::PRP_NAME => 'Company C.1',
+            Hierarchy::PRP_ID => 6,
+            Hierarchy::PRP_LEFT => 9,
+            Hierarchy::PRP_RIGHT => 16,
+        ],[
+            Hierarchy::PRP_NAME => 'Company C.1.1',
+            Hierarchy::PRP_ID => 7,
+            Hierarchy::PRP_LEFT => 10,
+            Hierarchy::PRP_RIGHT => 11,
+        ],[
+            Hierarchy::PRP_NAME => 'Company C.1.2',
+            Hierarchy::PRP_ID => 8,
+            Hierarchy::PRP_LEFT => 12,
+            Hierarchy::PRP_RIGHT => 15,
+        ],[
+            Hierarchy::PRP_NAME => 'Company C.1.2.1',
+            Hierarchy::PRP_ID => 9,
+            Hierarchy::PRP_LEFT => 13,
+            Hierarchy::PRP_RIGHT => 14,
+        ]]);
     }
 }

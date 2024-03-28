@@ -7,6 +7,9 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Laravel\Passport\Client as BaseClient;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @mixin IdeHelperClient
+ */
 class Client extends BaseClient implements AuthorizableContract
 {
     use HasRoles;
