@@ -1,6 +1,7 @@
 <script setup>
+
 </script>
 
 <template>
-    <router-view/>
+    <h2>Admin / Users / Permissions</h2>
 </template>

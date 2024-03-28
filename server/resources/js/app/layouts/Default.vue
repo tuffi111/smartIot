@@ -6,11 +6,11 @@
 -->
 <script setup>
 import {onMounted, ref, useSlots} from 'vue'
-import {useQuasar} from "quasar";
-import {useRouter} from "vue-router";
-import {logout, can, isAuth} from "@/auth.js";
-import {useBrowserSettings} from "@app/services/browserSettings.js";
-import {Model} from "@/models/Model.js";
+import {useRouter} from "vue-router"
+import {logout, can, isAuth} from "@/auth.js"
+import {useSystem} from "@app/services/System.js"
+import {useQuasar} from "quasar"
+
 import {
     ionAddCircleOutline,
     ionContrastOutline,
@@ -23,67 +23,20 @@ import {
     ionRemoveCircleOutline,
     ionSettingsOutline,
     ionWarningOutline
-} from "@quasar/extras/ionicons-v7";
+} from "@quasar/extras/ionicons-v7"
 
 
-
+const System = useSystem(useQuasar()).autoLoad(false) // If System is not used (even is not in viewport), no load event will be triggered. Do it manually to be safe.
 const router = useRouter()
-const q = useQuasar();
 const slots = useSlots()
 const leftDrawerOpen = ref(false)
 const rightDrawerOpen = ref(false)
-const browserSettings = useBrowserSettings()
 const leftDrawerWidth = ref(300)
 let drawerWidth = leftDrawerWidth
 let initialLeftDrawerWidth
-let defaultFontsize = 11
 
 
-browserSettings.bind(Model.EVENT_CHANGED, (data) => {
-    const {themeMode} = data;
-    setTheme(themeMode);
-    applyFontSize(parseFloat(data.fontsize));
-})
 
-function getFontSize() {
-    return parseFloat(browserSettings.get('fontsize'))
-}
-
-function stepFontSize(step = 1) {
-    setFontSize(getFontSize() + step)
-}
-
-
-function setFontSize(set) {
-    set = parseFloat(set)
-    browserSettings.set('fontsize', set)
-    applyFontSize(set)
-}
-
-function applyFontSize(size) {
-    const list = getContainerElements()
-    for (let index = 0; index < list.length; ++index) {
-        list[index]["style"].fontSize = size + "px"
-    }
-}
-
-function toggleTheme() {
-    setTheme(!browserSettings.get('themeMode'))
-    browserSettings.set('themeMode', q.dark.isActive)
-}
-
-function setTheme(set) {
-    if (set === undefined) {
-        q.dark.set("auto")
-    } else {
-        q.dark.set(set)
-    }
-}
-
-
-function getContainerElements(selector = null) {
-    return document.querySelectorAll(selector ?? ".q-page-container")
-}
 
 function toggleLeftDrawer() {
     leftDrawerOpen.value = !leftDrawerOpen.value
@@ -106,30 +59,22 @@ function resizeDrawer(ev) {
 }
 
 async function sendLogout() {
-/*
-    logout().then((data)=>{
-        console.debug('Logout successful', data);
-    }).catch((error)=>{
-        console.error('Logout error', error);
-    }).finally(()=>{
-        router.push('/login')
-    })
-/**/
 
-    logout((data) => {
+    logout()
+        .then((data) => {
             console.debug('Logout successful', data);
-        },
-        (error) => {
+        })
+        .catch((error) => {
             console.error('Logout error', error);
-        },
-        () => {
+        })
+        .finally(() => {
             router.push('/login')
-        })/**/
+        })
 }
 
 onMounted(() => {
-    setTheme(browserSettings.get('themeMode'));
-    applyFontSize(getFontSize())
+    // If System is not used (even is not in viewport), no load event will be triggered. Do it manually to be safe.
+    System.load()
 })
 
 
@@ -257,21 +202,22 @@ onMounted(() => {
 
                     <q-item>
                         <q-item-section>
-                            <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline" @click="toggleTheme"/>
+                            <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline"
+                                   @click="System.toggleTheme()"/>
                         </q-item-section>
 
                         <q-item-section>
                             <q-btn title="Decrease fontsize" :icon="ionRemoveCircleOutline"
-                                   @click="stepFontSize(-1)"/>
+                                   @click="System.stepFontSize(-1)"/>
                         </q-item-section>
-
                         <q-item-section>
                             <q-btn title="Reset fontsize" :icon="ionRefreshCircleOutline"
-                                   @click="setFontSize(defaultFontsize)"></q-btn>
+                                   @click="System.setFontSize(System.defaultFontsize())"></q-btn>
                         </q-item-section>
 
                         <q-item-section>
-                            <q-btn title="Increase fontsize" :icon="ionAddCircleOutline" @click="stepFontSize(1)"/>
+                            <q-btn title="Increase fontsize" :icon="ionAddCircleOutline"
+                                   @click="System.stepFontSize(1)"/>
                         </q-item-section>
 
 
@@ -279,7 +225,7 @@ onMounted(() => {
 
                     <q-separator/>
 
-                    <q-item v-if="can('settings')" clickable v-ripple to="/settings">
+                    <q-item v-if="can('settings')" clickable v-ripple to="/admin">
                         <q-item-section avatar>
                             <q-icon title="Settings" :name="ionSettingsOutline"/>
                         </q-item-section>

@@ -1,6 +1,8 @@
 <script setup>
+
 </script>
 
 <template>
-    <router-view/>
+    <h2>Admin</h2>
 </template>
+

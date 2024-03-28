@@ -2,7 +2,6 @@
 import {onBeforeMount, ref} from "vue";
 import LampBody from "@app/components/LampBody.vue";
 //import JsonData from '../../../data.json';
-import Default from "@app/layouts/Default.vue";
 
 
 const props = defineProps()

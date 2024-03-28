@@ -128,13 +128,14 @@ export class Model {
 
         if (!this._data) {
             this._data = this.makeData()
-            if (this.autoLoad()) {
-                this.load()
-            }
 
             watch(this._data, (newValue, oldValue) => {
                 this.onChange(newValue, oldValue)
             })
+
+            if (this.autoLoad()) {
+                this.load()
+            }
         }
 
         return this._data
@@ -151,9 +152,6 @@ export class Model {
         if (!this._storage) {
             this.storage(this.makeStorage())
             this.storage().model(this)
-            this.storage().bind(Storage.EVENT_CHANGED, () => {
-
-            })
         }
 
         return this._storage
