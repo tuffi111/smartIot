@@ -45,19 +45,27 @@ const showPass = ref(false);
                     <q-icon :name="ionFingerPrint"/>
                 </template>
                 <template v-slot:append>
-                    <q-icon v-if="!showPass" title="Show password" :name="ionEyeOutline"
-                            @click="showPass=!showPass"/>
-                    <q-icon v-if="showPass" title="Hide password" :name="ionEyeOffOutline"
-                            @click="showPass=!showPass"/>
+                    <div class="cursor-pointer">
+                        <q-icon v-if="!showPass"
+                                title="Show password"
+                                :name="ionEyeOutline"
+                                @click="showPass=!showPass"
+                        />
+                        <q-icon v-if="showPass"
+                                title="Hide password"
+                                :name="ionEyeOffOutline"
+                                @click="showPass=!showPass"
+                        />
+                    </div>
                 </template>
             </q-input>
 
             <q-checkbox name="stayAuth"
-                     label="Keep logged in"
-                     v-model="data['stayAuth']"
-                     :error="model.errors().has('stayAuth')"
-                     :error-message="model.errors().for('stayAuth')"
-                     class="q-pt-lg"
+                        label="Keep logged in"
+                        v-model="data['stayAuth']"
+                        :error="model.errors().has('stayAuth')"
+                        :error-message="model.errors().for('stayAuth')"
+                        class="q-pt-lg"
             />
         </template>
     </model-view>
