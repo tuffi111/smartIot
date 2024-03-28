@@ -18,15 +18,25 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasPermissions, HasRoles;
 
+    const PRP_ID = 'id';
+    const PRP_NAME = 'name';
+    const PRP_EMAIL = 'email';
+    const PRP_EMAIL_VERIFIED_AT = 'email_verified_at';
+    const PRP_PASSWORD = 'password';
+    const PRP_REMEMBER_TOKEN = 'remember_token';
+    const PRP_CREATED_AT = 'created_at';
+    const PRP_UPDATED_AT = 'updated_at';
+
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        self::PRP_NAME,
+        self::PRP_EMAIL,
+        self::PRP_PASSWORD,
     ];
 
     /**
@@ -35,8 +45,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        self::PRP_PASSWORD,
+        self::PRP_REMEMBER_TOKEN,
     ];
 
     /**
@@ -45,8 +55,8 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        self::PRP_EMAIL_VERIFIED_AT => 'datetime',
+        self::PRP_PASSWORD => 'hashed',
     ];
 
 

@@ -1,7 +1,9 @@
 import {Storage} from './Storage'
-import {useApi} from "@/requests.js";
-import {apiRoute, resolveRoute} from "@/backend-router.js";
+import {useRoute} from 'vue-router'
+import {useApi, uriFromRoute, methodFromRoute} from "@/requests.js";
+import {resolveRoute} from "@/backend-router.js";
 
+const route = useRoute();
 
 export class ApiStorage extends Storage {
 
@@ -11,8 +13,8 @@ export class ApiStorage extends Storage {
 
     makeRoutes() {
         return {
-            [ApiStorage.ROUTE_FETCH]: apiRoute('api.models.fetch'),
-            [ApiStorage.ROUTE_UPDATE]: apiRoute('api.models.update')
+            [ApiStorage.ROUTE_FETCH]: resolveRoute('api.models.fetch', {model: this.model().name()}),
+            [ApiStorage.ROUTE_UPDATE]: resolveRoute('api.models.update', {model: this.model().name()})
         }
     }
 
@@ -23,9 +25,7 @@ export class ApiStorage extends Storage {
     makeStore() {
         return {
             load: () => {
-                const method = this.method(ApiStorage.ROUTE_FETCH)
-                const route = this.route(ApiStorage.ROUTE_FETCH, this.model().name())
-                return this.apiCall(method, route)
+                return this.apiCall(this.routes()[ApiStorage.ROUTE_FETCH])
                     .then((data) => {
                         console.table(data)
                         this.model().assignData(data)
@@ -37,9 +37,7 @@ export class ApiStorage extends Storage {
                     })
             },
             save: (data) => {
-                const method = this.method(ApiStorage.ROUTE_UPDATE)
-                const route = this.route(ApiStorage.ROUTE_UPDATE, this.model().name())
-                return this.apiCall(method, route, data)
+                return this.apiCall(this.routes()[ApiStorage.ROUTE_UPDATE], data)
                     .then((data) => {
                         this.model().assignData(data)
                         return data
@@ -53,11 +51,11 @@ export class ApiStorage extends Storage {
     }
 
     method(action) {
-        return this.routes()[action].methods[0].toUpperCase()
+        return methodFromRoute(this.routes()[action])
     }
 
     route(action, name = null) {
-        return this.escapeRoute(resolveRoute(this.routes()[action].name)) + '/' + name ?? this.model().name()
+        return this.escapeRoute(uriFromRoute(this.routes()[action]))
     }
 
     routes(set = null) {
@@ -75,7 +73,7 @@ export class ApiStorage extends Storage {
     }
 
 
-    apiCall = async (method, route, data = {}, api = null, handlerQueue = null) => {
+    apiCall = async (route, data = {}, api = null, handlerQueue = null) => {
         if (!handlerQueue) {
             handlerQueue = Array.from(this.apiHandler())
         }
@@ -85,10 +83,7 @@ export class ApiStorage extends Storage {
         }
 
         this.loading(true)
-        return api(route, Object.assign({
-            method,
-            data
-        }))
+        return api(route, {data})
             .then((response) => {
                 return response.data
             })
@@ -97,20 +92,16 @@ export class ApiStorage extends Storage {
             })
             .catch((error) => {
                 if (handlerQueue.length) {
-                    console.warn("API: " + route + ": No valid api response. Trying next api handler.", error)
+                    console.warn("API: " + uri + ": No valid api response. Trying next api handler.", error)
                     const api = handlerQueue.shift();
-                    this.apiCall(method, route, data, api, handlerQueue)
+                    this.apiCall(route, data, api, handlerQueue)
                 } else {
-                    console.error("API: " + route + ": No api handler left. Api update failed. Last error: ", error)
+                    console.error("API: " + uri + ": No api handler left. Api update failed. Last error: ", error)
                     throw Error(error)
                 }
             }).finally(() => {
                 this.loading(false)
             })
-    }
-
-    escapeRoute(path) {
-        return path.trim().replace(/[\/|\\]+$/, ''); //$ marks the end of a string. [\/|\\]+$ means: all / or \ characters at the end of a string
     }
 
 }

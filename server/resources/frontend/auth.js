@@ -1,7 +1,7 @@
 import {useApi, useHttp} from "@/requests.js";
 import {AuthModel} from "@app/models/auth/AuthModel.js";
 import {UserModel} from "@app/models/auth/UserModel.js";
-import {reactive, ref} from "vue";
+import {ref} from "vue";
 import {resolveRoute} from "@/backend-router.js";
 
 
@@ -147,14 +147,12 @@ export function has(roles) {
 export async function refresh(set = null) {
     if (!isLoading.value && set === null) {
         isLoading.value = true
-        return useApi()('permissions')
+        return useApi()(resolveRoute('api.auth.permissions'))
             .then((response) => {
-                //console.log('================ CREATE PERMISSIONS ================', response.data.data)
                 resetPermissions(response.data.data)
                 return response
             })
             .catch((error) => {
-                //console.log('================ CREATE PERMISSIONS by error ================', error)
                 resetPermissions()
                 return error
             })

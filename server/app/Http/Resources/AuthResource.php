@@ -3,29 +3,18 @@
 namespace App\Http\Resources;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Collection;
 
 class AuthResource extends JsonResource
 {
-
     static function byUser(User|null $user): self
     {
         return new static([
             'auth' => (($user) ? [
-                'user' => $user,
-                'permissions' => $user->permissions()->get(),
+                'user' => Collection::make($user->withoutRelations()->toArray())->only(User::PRP_NAME, User::PRP_EMAIL),
+                'permissions' => $user->getAllPermissions()->pluck('name'),
             ] : null)
         ]);
-    }
-
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(Request $request): array
-    {
-        return parent::toArray($request);
     }
 }

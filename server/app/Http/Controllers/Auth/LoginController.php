@@ -4,11 +4,16 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AuthResource;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+class MeeGuard extends SessionGuard
+{
+
+
+}
 
 class LoginController extends Controller
 {
@@ -27,9 +32,15 @@ class LoginController extends Controller
         logout as logoutBase;
     }
 
+
+    protected function guard()
+    {
+        return Auth::guard();
+    }
+
     protected function authenticated(Request $request, $user)
     {
-        //todo: do nit revoke to much
+        //todo: do not revoke to much
         $user->tokens()->delete();
         return AuthResource::byUser($user)->additional([
             'token' => $user->createToken('Laravel Password Grant Client')->accessToken,
@@ -52,4 +63,8 @@ class LoginController extends Controller
 
     }
 
+    function permissions(Request $request)
+    {
+        return AuthResource::byUser($request->user());
+    }
 }
