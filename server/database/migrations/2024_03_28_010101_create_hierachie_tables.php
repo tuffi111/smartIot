@@ -17,9 +17,10 @@ return new class extends Migration
     {
         Schema::create(Hierarchy::table(), function (Blueprint $table) {
             $table->unsignedInteger(Hierarchy::PRP_ID)->primary()->autoIncrement();
-            $table->string(Hierarchy::PRP_NAME);
             $table->unsignedInteger(Hierarchy::PRP_LEFT)->index();
             $table->unsignedInteger(Hierarchy::PRP_RIGHT)->index();
+            $table->char(Hierarchy::PRP_UUID,40)->default(DB::raw('SHA1(RANDOM_BYTES(128))'))->unique();
+            $table->string(Hierarchy::PRP_NAME);
             $table->unique([Hierarchy::PRP_LEFT, Hierarchy::PRP_RIGHT], Hierarchy::KEY_NODE_ID);
         });
     }

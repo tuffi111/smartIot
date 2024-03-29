@@ -17,10 +17,10 @@ class Hierarchy extends BaseModel
     public $timestamps = false;
 
     const PRP_ID = 'id';
+    const PRP_UUID = 'uuid';
     const PRP_NAME = 'name';
     const PRP_LEFT = 'lft';
     const PRP_RIGHT = 'rgt';
-
     const PRP_CHILDREN = 'children';
 
     const KEY_NODE_ID = 'node_id';
@@ -28,6 +28,7 @@ class Hierarchy extends BaseModel
 
     protected $fillable = [
         self::PRP_ID,
+        self::PRP_UUID,
         self::PRP_NAME,
         self::PRP_LEFT,
         self::PRP_RIGHT,
@@ -47,7 +48,13 @@ class Hierarchy extends BaseModel
     static function parents(int $ofId, $includeOriginNode = true): Builder|\Illuminate\Database\Query\Builder
     {
         $sql = (new static())
-            ->select(['parent.id', 'parent.name', 'parent.lft', 'parent.rgt'])
+            ->select([
+                'parent.' . static::PRP_ID,
+                'parent.' . static::PRP_UUID,
+                'parent.' . static::PRP_NAME,
+                'parent.' . static::PRP_LEFT,
+                'parent.' . static::PRP_RIGHT
+            ])
             ->fromRaw(static::table('`') . ' AS `node`, ' . static::table('`') . ' AS `parent`')
             ->whereBetweenColumns(
                 'node.' . static::PRP_LEFT,
@@ -81,7 +88,7 @@ class Hierarchy extends BaseModel
     static function children(int $ofId, $includeParent = true): Builder|\Illuminate\Database\Query\Builder
     {
         $sql = (new static())
-            ->select(['node.id', 'node.name'])
+            ->select(['node.' . static::PRP_ID, 'node.' . static::PRP_UUID, 'node.' . static::PRP_NAME])
             ->fromRaw(static::table() . ' AS `node`, ' . static::table() . ' AS `parent`')
             ->whereBetweenColumns(
                 'node.' . static::PRP_LEFT,
@@ -114,8 +121,8 @@ class Hierarchy extends BaseModel
     static function depth(): Builder|\Illuminate\Database\Query\Builder
     {
         return (new static())
-            ->select(['node.id', 'node.name'])
-            ->selectRaw('(COUNT(`parent`.`name`)-1) AS `depth`')
+            ->select(['node.' . static::PRP_ID, 'node.' . static::PRP_UUID, 'node.' . static::PRP_NAME])
+            ->selectRaw('(COUNT(`parent`.`' . static::PRP_NAME . '`)-1) AS `depth`')
             ->fromRaw(static::table() . ' AS `node`, ' . static::table() . ' AS `parent`')
             ->whereBetweenColumns(
                 'node.' . static::PRP_LEFT,
@@ -313,13 +320,14 @@ class Hierarchy extends BaseModel
     }
 
 
-    static function fromAdjacency(Collection $items, &$arr = [], &$counter = 0): Collection
+    static function fromAdjacency(Collection $items, array &$arr = [], int &$counter = 0): Collection
     {
         $items->each(function ($item) use (&$arr, &$counter) {
             $counter++;
             if (!array_key_exists($item[static::PRP_ID], $arr)) {
                 $arr[$item[static::PRP_ID]] = [
                     static::PRP_ID => $item[static::PRP_ID],
+                    static::PRP_UUID => $item[static::PRP_UUID],
                     static::PRP_NAME => $item[static::PRP_NAME],
                     static::PRP_LEFT => $counter,
                 ];
