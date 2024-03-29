@@ -4,6 +4,7 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 
 /**
  * @method static insert(array $array)
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class Hierarchy extends BaseModel
 {
+    protected static bool $withRoot = false;
     public $timestamps = false;
 
     const PRP_ID = 'id';
@@ -19,17 +21,16 @@ class Hierarchy extends BaseModel
     const PRP_LEFT = 'lft';
     const PRP_RIGHT = 'rgt';
 
+    const PRP_CHILDREN = 'children';
+
+    const KEY_NODE_ID = 'node_id';
+
+
     protected $fillable = [
         self::PRP_ID,
         self::PRP_NAME,
         self::PRP_LEFT,
         self::PRP_RIGHT,
-    ];
-
-    protected $hidden = [
-    ];
-
-    protected $casts = [
     ];
 
 
@@ -43,18 +44,27 @@ class Hierarchy extends BaseModel
      *              AND `node`.`id` = 7
      *  ORDER BY    `parent`.`lft`;
      */
-    static function parents(int $ofId): Builder|\Illuminate\Database\Query\Builder
+    static function parents(int $ofId, $includeOriginNode = true): Builder|\Illuminate\Database\Query\Builder
     {
-        return (new static())
-            ->select(['parent.id', 'parent.name'])
+        $sql = (new static())
+            ->select(['parent.id', 'parent.name', 'parent.lft', 'parent.rgt'])
             ->fromRaw(static::table('`') . ' AS `node`, ' . static::table('`') . ' AS `parent`')
             ->whereBetweenColumns(
                 'node.' . static::PRP_LEFT,
                 ['parent.' . static::PRP_LEFT, 'parent.' . static::PRP_RIGHT]
             )
-            ->where('parent.' . static::PRP_ID, '>', 1) // without root
             ->where('node.' . static::PRP_ID, '=', $ofId)
-            ->orderBy('node.' . static::PRP_LEFT);
+            ->orderBy('parent.' . static::PRP_LEFT);
+
+        if (!static::withRoot()) {
+            $sql->where('parent.' . static::PRP_ID, '>', 1);
+        }
+
+        if (!$includeOriginNode) {
+            $sql->where('parent.' . static::PRP_ID, '!=', $ofId);
+        }
+
+        return $sql;
     }
 
 
@@ -68,9 +78,9 @@ class Hierarchy extends BaseModel
      *              AND `parent`.`id` = 1
      *  ORDER BY    `node`.`lft`;
      */
-    static function children(int $ofId): Builder|\Illuminate\Database\Query\Builder
+    static function children(int $ofId, $includeParent = true): Builder|\Illuminate\Database\Query\Builder
     {
-        return (new static())
+        $sql = (new static())
             ->select(['node.id', 'node.name'])
             ->fromRaw(static::table() . ' AS `node`, ' . static::table() . ' AS `parent`')
             ->whereBetweenColumns(
@@ -79,6 +89,12 @@ class Hierarchy extends BaseModel
             )
             ->where('parent.' . static::PRP_ID, '=', $ofId)
             ->orderBy('node.' . static::PRP_LEFT);
+
+        if (!$includeParent) {
+            $sql->where('node.' . static::PRP_ID, '!=', $ofId);
+        }
+
+        return $sql;
     }
 
 
@@ -190,6 +206,24 @@ class Hierarchy extends BaseModel
     }
 
 
+    static function addBefore($id, $name): self
+    {
+        // todo
+        return new static;
+    }
+
+
+    static function withRoot(?bool $set = null): bool|self
+    {
+        if (is_null($set)) {
+            return static::$withRoot;
+        }
+
+        static::$withRoot = !!$set;
+
+        return new static;
+    }
+
     /**
      * Delete node in between
      *
@@ -209,6 +243,7 @@ class Hierarchy extends BaseModel
      */
     function delete()
     {
+        // todo
     }
 
 
@@ -229,6 +264,7 @@ class Hierarchy extends BaseModel
      */
     function deleteChildren()
     {
+        // todo
     }
 
 
@@ -244,5 +280,59 @@ class Hierarchy extends BaseModel
      */
     function aggregate()
     {
+        // todo
+    }
+
+    static protected function getChildren(Collection $items): Collection
+    {
+        $arr = collect();
+        while ($item = $items->shift()) {
+            $newArr = collect($item)->except([static::PRP_LEFT, static::PRP_RIGHT]);
+            if (($item[static::PRP_LEFT] + 1) !== $item[static::PRP_RIGHT]) { // NODE
+                $children = collect(
+                    $items->whereBetween(static::PRP_RIGHT, [$item[static::PRP_LEFT], $item[static::PRP_RIGHT]])
+                );
+                $items->forget($items->whereIn(static::PRP_ID, $children->pluck(static::PRP_ID))->keys());
+                $newChildren = static::getChildren($children);
+                if ($newChildren->count()) {
+                    $newArr[static::PRP_CHILDREN] = $newChildren;
+                }
+            }
+            $arr->push($newArr);
+        }
+        unset($newArr, $newChildren);
+        return $arr;
+    }
+
+    static function toAdjacency(Builder $items = null): Collection
+    {
+        if (!$items) {
+            $items = static::make();
+        }
+        return collect(static::getChildren(collect($items->orderBy(static::PRP_LEFT)->get()))->toArray());
+    }
+
+
+    static function fromAdjacency(Collection $items, &$arr = [], &$counter = 0): Collection
+    {
+        $items->each(function ($item) use (&$arr, &$counter) {
+            $counter++;
+            if (!array_key_exists($item[static::PRP_ID], $arr)) {
+                $arr[$item[static::PRP_ID]] = [
+                    static::PRP_ID => $item[static::PRP_ID],
+                    static::PRP_NAME => $item[static::PRP_NAME],
+                    static::PRP_LEFT => $counter,
+                ];
+            }
+
+            if (array_key_exists(static::PRP_CHILDREN, $item)) {
+                static::fromAdjacency(collect($item[static::PRP_CHILDREN]), $arr, $counter);
+            }
+
+            $counter++;
+            $arr[$item[static::PRP_ID]][static::PRP_RIGHT] = $counter;
+        });
+
+        return collect($arr);
     }
 }

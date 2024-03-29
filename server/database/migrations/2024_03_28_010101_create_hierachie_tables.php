@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string(Hierarchy::PRP_NAME);
             $table->unsignedInteger(Hierarchy::PRP_LEFT)->index();
             $table->unsignedInteger(Hierarchy::PRP_RIGHT)->index();
+            $table->unique([Hierarchy::PRP_LEFT, Hierarchy::PRP_RIGHT], Hierarchy::KEY_NODE_ID);
         });
-
     }
 
     /**
