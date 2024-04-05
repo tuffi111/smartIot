@@ -1,5 +1,6 @@
 <script setup>
-import {useQuasar} from "quasar";
+import 'vue-json-pretty/lib/styles.css';
+import VueJsonPretty from "vue-json-pretty";
 import {useSystem} from "@app/services/System.js";
 import {
     ionAddCircleOutline,
@@ -8,18 +9,19 @@ import {
     ionRemoveCircleOutline
 } from "@quasar/extras/ionicons-v7";
 
-
-const System = useSystem('admin/system/index', useQuasar())
-
-
 const props = defineProps()
+const System = useSystem()
 
 </script>
 
 <template>
     <h2>Admin / System / Dashboard</h2>
 
-    {{ System.settings().get() }}
+
+    System settings
+    <vue-json-pretty :data="System.settings().data()" :deep="1"/>
+
+
     <q-item>
         <q-item-section>
             <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline" @click="System.toggleTheme()"/>

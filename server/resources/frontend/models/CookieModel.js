@@ -8,11 +8,6 @@ export class CookieModel extends Model {
         return new CookieStorage()
     }
 
-    delete() {
-        //todo: move model out of storage: this.storage().delete(this.model().name())
-        this.storage().delete()
-    }
-
     maxAge(setSeconds) {
         this.storage().maxAge(setSeconds)
         return this

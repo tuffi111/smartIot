@@ -9,7 +9,7 @@ export class ApiDataModel extends Model {
     }
 
     makeStorage() {
-        return new ApiStorage()
+        return new ApiStorage(this)
             /*.routes({
                 [ApiStorage.ROUTE_FETCH]: apiRoute('api.models.fetch'),
                 [ApiStorage.ROUTE_UPDATE]: apiRoute('api.models.update'),

@@ -1,7 +1,12 @@
 <script setup>
 import Default from "@app/layouts/Default.vue";
 import {
-    ionConstructOutline, ionFingerPrintOutline, ionLockOpenOutline, ionPeopleOutline, ionVideocamOutline
+    ionConstructOutline,
+    ionFingerPrintOutline,
+    ionHardwareChipOutline,
+    ionLockOpenOutline,
+    ionPeopleOutline,
+    ionVideocamOutline
 } from "@quasar/extras/ionicons-v7";
 
 
@@ -68,6 +73,17 @@ import {
                     </q-item-section>
                     <q-item-section>
                         <q-item-label>OAuth</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                    </q-item-section>
+                </q-item>
+
+                <q-item to="/admin/examples">
+                    <q-item-section avatar>
+                        <q-avatar :icon="ionHardwareChipOutline"/>
+                    </q-item-section>
+                    <q-item-section>
+                        <q-item-label>Examples</q-item-label>
                     </q-item-section>
                     <q-item-section side>
                     </q-item-section>

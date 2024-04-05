@@ -1,22 +1,13 @@
 import {Storage} from './Storage'
-import {useRoute} from 'vue-router'
-import {useApi, uriFromRoute, methodFromRoute} from "@/requests.js";
+import {useApi} from "@/requests.js";
 import {resolveRoute} from "@/backend-router.js";
 
-const route = useRoute();
 
 export class ApiStorage extends Storage {
 
     static ROUTE_FETCH = 'fetch'
     static ROUTE_UPDATE = 'update'
-
-
-    makeRoutes() {
-        return {
-            [ApiStorage.ROUTE_FETCH]: resolveRoute('api.models.fetch', {model: this.model().name()}),
-            [ApiStorage.ROUTE_UPDATE]: resolveRoute('api.models.update', {model: this.model().name()})
-        }
-    }
+    static ROUTE_DELETE = 'delete'
 
     apiHandler() {
         return [useApi()]
@@ -24,54 +15,29 @@ export class ApiStorage extends Storage {
 
     makeStore() {
         return {
-            load: () => {
-                return this.apiCall(this.routes()[ApiStorage.ROUTE_FETCH])
-                    .then((data) => {
-                        console.table(data)
-                        this.model().assignData(data)
-                        return data
-                    })
-                    .catch((error) => {
-                        //console.warn('API-GET-CALL-ERROR:', error)
-                        return error
-                    })
+            find: async (name, filter, order) => {
+                return this.apiCall(this.route(name, ApiStorage.ROUTE_FETCH), {filter: filter.value, order: order.value})
             },
-            save: (data) => {
-                return this.apiCall(this.routes()[ApiStorage.ROUTE_UPDATE], data)
-                    .then((data) => {
-                        this.model().assignData(data)
-                        return data
-                    })
-                    .catch((error) => {
-                        //console.warn('API-SAVE-CALL-ERROR:', error)
-                        return error
-                    })
+            save: async (name, data) => {
+                return this.apiCall(this.route(name, ApiStorage.ROUTE_UPDATE), data)
+            },
+            delete: async (name) => {
+                return this.apiCall(this.route(name, ApiStorage.ROUTE_DELETE))
             }
         }
     }
 
-    method(action) {
-        return methodFromRoute(this.routes()[action])
-    }
-
-    route(action, name = null) {
-        return this.escapeRoute(uriFromRoute(this.routes()[action]))
-    }
-
-    routes(set = null) {
-        if (set) {
-            this._routes = set
-            return this
-
+    routes(name) {
+        return {
+            [ApiStorage.ROUTE_FETCH]: resolveRoute('api.models.fetch', {model: name}),
+            [ApiStorage.ROUTE_UPDATE]: resolveRoute('api.models.update', {model: name}),
+            [ApiStorage.ROUTE_DELETE]: resolveRoute('api.models.delete', {model: name})
         }
-
-        if (!this._routes) {
-            this._routes = this.makeRoutes()
-        }
-
-        return this._routes
     }
 
+    route(name, action) {
+        return this.routes(name)[action]
+    }
 
     apiCall = async (route, data = {}, api = null, handlerQueue = null) => {
         if (!handlerQueue) {
@@ -82,8 +48,7 @@ export class ApiStorage extends Storage {
             api = handlerQueue.shift()
         }
 
-        this.loading(true)
-        return api(route, {data})
+        return api(route, data)
             .then((response) => {
                 return response.data
             })
@@ -92,15 +57,13 @@ export class ApiStorage extends Storage {
             })
             .catch((error) => {
                 if (handlerQueue.length) {
-                    console.warn("API: " + uri + ": No valid api response. Trying next api handler.", error)
+                    console.warn("API: " + route.uri + ": No valid api response. Trying next api handler.", error)
                     const api = handlerQueue.shift();
                     this.apiCall(route, data, api, handlerQueue)
                 } else {
-                    console.error("API: " + uri + ": No api handler left. Api update failed. Last error: ", error)
+                    console.error("API: " + route.uri + ": No api handler left. Api update failed. Last error: ", error)
                     throw Error(error)
                 }
-            }).finally(() => {
-                this.loading(false)
             })
     }
 

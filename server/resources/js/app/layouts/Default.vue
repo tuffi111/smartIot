@@ -8,8 +8,8 @@
 import {onMounted, ref, useSlots} from 'vue'
 import {useRouter} from "vue-router"
 import {logout, can, isAuth} from "@/auth.js"
-import {useSystem} from "@app/services/System.js"
-import {useQuasar} from "quasar"
+import System from "@app/services/System.js";
+import {useQuasar} from "quasar";
 
 import {
     ionAddCircleOutline,
@@ -26,7 +26,10 @@ import {
 } from "@quasar/extras/ionicons-v7"
 
 
-const System = useSystem(useQuasar()).autoLoad(false) // If System is not used (even is not in viewport), no load event will be triggered. Do it manually to be safe.
+// Should be set in a component and not in main.js because: useQuasar() returns null in main.js
+const system = System.setup(useQuasar()).load()
+
+
 const router = useRouter()
 const slots = useSlots()
 const leftDrawerOpen = ref(false)
@@ -34,9 +37,6 @@ const rightDrawerOpen = ref(false)
 const leftDrawerWidth = ref(300)
 let drawerWidth = leftDrawerWidth
 let initialLeftDrawerWidth
-
-
-
 
 function toggleLeftDrawer() {
     leftDrawerOpen.value = !leftDrawerOpen.value
@@ -73,8 +73,7 @@ async function sendLogout() {
 }
 
 onMounted(() => {
-    // If System is not used (even is not in viewport), no load event will be triggered. Do it manually to be safe.
-    System.load()
+
 })
 
 
@@ -201,23 +200,24 @@ onMounted(() => {
                     </q-item>
 
                     <q-item>
+
                         <q-item-section>
                             <q-btn title="Toggle dark/light mode" :icon="ionContrastOutline"
-                                   @click="System.toggleTheme()"/>
+                                   @click="system.toggleTheme()"/>
                         </q-item-section>
 
                         <q-item-section>
                             <q-btn title="Decrease fontsize" :icon="ionRemoveCircleOutline"
-                                   @click="System.stepFontSize(-1)"/>
+                                   @click="system.stepFontSize(-1)"/>
                         </q-item-section>
                         <q-item-section>
                             <q-btn title="Reset fontsize" :icon="ionRefreshCircleOutline"
-                                   @click="System.setFontSize(System.defaultFontsize())"></q-btn>
+                                   @click="system.setFontSize(System.defaultFontsize())"></q-btn>
                         </q-item-section>
 
                         <q-item-section>
                             <q-btn title="Increase fontsize" :icon="ionAddCircleOutline"
-                                   @click="System.stepFontSize(1)"/>
+                                   @click="system.stepFontSize(1)"/>
                         </q-item-section>
 
 

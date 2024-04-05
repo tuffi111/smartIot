@@ -32,7 +32,7 @@ const sendLogin = (e) => {
     <default>
 
         isAuth: {{ isAuth() }}<hr>
-        Data: {{ authData().get() }}<hr>
+        Data: {{ authData().data() }}<hr>
         User: {{ user() }}<hr>
 
         <q-card class="my-card w-50">

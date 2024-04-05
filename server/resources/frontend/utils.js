@@ -43,3 +43,22 @@ Object.objectDeepKeys = Object.objectDeepKeys ||
         return Object.keys(obj).filter(key => obj[key] instanceof Object).map(key => Object.objectDeepKeys(obj[key]).map(k => `${key}.${k}`)).reduce((x, y) => x.concat(y), Object.keys(obj))
     }
 
+
+export function isObject(test) {
+    return (typeof test === 'object' && !Array.isArray(test))
+}
+
+export function isArray(test) {
+    return Array.isArray(test)
+}
+
+export function indexOf (arr, q){
+  return arr.findIndex(item => q.toLowerCase() === item.toLowerCase())
+}
+
+export default {
+    isObject,
+    isArray,
+    indexOf,
+}
+

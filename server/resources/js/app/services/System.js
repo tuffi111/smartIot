@@ -9,10 +9,8 @@ class SystemService {
     _noUpdate = false
     _defaultFontsize = 12
 
-    constructor(quasar = null) {
-        if (quasar) {
-            this.theme(quasar)
-        }
+    constructor(quasar) {
+        this.theme(quasar)
     }
 
     getFontSize() {
@@ -53,17 +51,15 @@ class SystemService {
         if (!this._settings) {
             this._settings = new SystemSettings()
 
-
-            console.log(this._settings)
-
             this._settings.bind(Model.EVENT_CHANGED, (data) => {
                 try {
                     if (this._noUpdate) return
-                    //this._noUpdate = true
+                    this._noUpdate = true
                     const {themeMode} = data;
                     this.setTheme(themeMode);
                     this.applyFontSize(parseFloat(data.fontsize));
                 } catch (error) {
+                    this._noUpdate = false
                     throw error
                 }
                 this._noUpdate = false
@@ -95,7 +91,7 @@ class SystemService {
     }
 
     load() {
-        this.settings().load()
+        this.settings().wait()
         return this
     }
 
@@ -107,11 +103,24 @@ class SystemService {
 
 let systemInstance;
 
-export function useSystem(quasar = null) {
-
-    if (!systemInstance) {
+function setup(quasar) {
+    if(!systemInstance){
         systemInstance = new SystemService(quasar)
     }
-
     return systemInstance
+}
+
+
+function useSystem() {
+    return systemInstance
+}
+
+export {
+    setup,
+    useSystem
+}
+
+export default {
+    setup,
+    useSystem
 }

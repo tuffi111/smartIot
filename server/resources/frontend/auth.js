@@ -1,12 +1,12 @@
 import {useApi, useHttp} from "@/requests.js";
-import {AuthModel} from "@app/models/auth/AuthModel.js";
-import {UserModel} from "@app/models/auth/UserModel.js";
+import {AuthData} from "@/models/auth/AuthData.js";
+import {UserModel} from "@/models/auth/UserModel.js";
 import {ref} from "vue";
 import {resolveRoute} from "@/backend-router.js";
 
 
-const _authData = new AuthModel()
-const _authUser = new UserModel()
+let _authData
+let _authUser
 const _permissions = ref({})
 const _permissionsDefault = {guest: true}
 const isLoading = ref(false)
@@ -15,16 +15,15 @@ const isLoading = ref(false)
 export function permissions() {
     if (!isLoading.value && !Object.keys(_permissions).length) {
         _permissions.value = _permissionsDefault
-        refresh()
     }
     return _permissions
 }
 
-function updatePermissions(data) {
+export function updatePermissions(data) {
     _permissions.value = Object.assign(_permissions.value, data)
 }
 
-function resetPermissions(data = {}) {
+export function resetPermissions(data = {}) {
     _permissions.value = data
 }
 
@@ -35,15 +34,21 @@ export {
 
 
 export function authData() {
+    if (!_authData) {
+        _authData = new AuthData()
+    }
     return _authData
 }
 
 export function user() {
+    if (!_authUser) {
+        _authUser = new UserModel()
+    }
     return _authUser
 }
 
 export async function login(loginData, onSuccess, onError) {
-    return useHttp()(resolveRoute('auth.login'), {method: "POST", data: loginData})
+    return useHttp()(resolveRoute('auth.login'),  loginData)
         .then((response) => {
             if (response['data'] && response['data']['token']) {
                 return response['data']
@@ -162,7 +167,6 @@ export async function refresh(set = null) {
     }
 
     if (set) {
-        //console.log('================ CREATE PERMISSIONS ================', set)
         resetPermissions(set)
     }
 
@@ -191,15 +195,21 @@ export async function canAccess(auth) {
     }
 
     return await Promise.all(resolvers)
-        .then(() => {
-            return true;
-        })
-        .catch(() => {
-            return false;
-        })
-
-     /**/
-
-    return false;
+        .then(() => true)
+        .catch(() => false)
 }
 
+
+export default {
+    authData,
+    permissions,
+    login,
+    logout,
+    refresh,
+    isAuth,
+    can,
+    has,
+    canAccess,
+    updatePermissions,
+    resetPermissions,
+}

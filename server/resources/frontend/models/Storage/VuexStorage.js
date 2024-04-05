@@ -3,37 +3,51 @@ import {useStore} from "vuex";
 
 export class VuexStorage extends Storage {
     static EVENT_UPDATE = 'update:modelValue'
+    static EVENT_DELETE = 'delete:modelValue'
 
     _vuexStore
 
+    constructor(model) {
+        super(model);
+    }
+
     makeStore() {
         return {
-            load: () => {
-                this.model().assignData(
-                    this.vuexStore().state[this.storageKey()][this.model().name()]
-                )
-                return this
+            find: async (name, filter, order) => {
+                return new Promise((resolve, reject) => {
+                    resolve(
+                        this.vuexStore(name).state[this.storageKey()][name]
+                    )
+                })
             },
-            save: (data, oldData) => {
-                this.vuexStore().commit(this.storageKey(this.model().name()) + '/' + VuexStorage.EVENT_UPDATE, {
-                    model: this.model(),
-                    data,
-                    oldData,
-                }) // see also: makeStoreModule().mutations
-                return this
+
+            save: async (name, data, oldData) => {
+                return new Promise((resolve, reject) => {
+                    this.vuexStore(name).commit(this.storageKey(name) + '/' + VuexStorage.EVENT_UPDATE, {
+                        model: name,
+                        data,
+                        oldData,
+                    }) // see also: this.makeStoreModule().mutations
+                }) // see also: this.makeStoreModule().mutations
+            },
+
+            delete: async (name) => {
+                return new Promise((resolve, reject) => {
+                    this.vuexStore(name).dispatch(this.storageKey(name) + '/' + VuexStorage.EVENT_DELETE, name)
+                })
             }
         }
     }
 
-    makeVuexStore() {
+    makeVuexStore(name) {
         const _store = useStore()
 
         if (!_store.hasModule(this.storageKey())) {
             _store.registerModule(this.storageKey(), this.makeStoreModule({}))
         }
 
-        if (!_store.hasModule([this.storageKey(), this.model().name()])) {
-            _store.registerModule([this.storageKey(), this.model().name()], this.makeStoreModule(this.model().data()))
+        if (!_store.hasModule([this.storageKey(), name])) {
+            _store.registerModule([this.storageKey(), name], this.makeStoreModule(this.model().data()))
         }
 
         return _store
@@ -55,15 +69,20 @@ export class VuexStorage extends Storage {
             mutations: {
                 [VuexStorage.EVENT_UPDATE](state, payload) {
                     Object.assign(state, payload.data);
-                    payload.model.assignData(state)
-                }
+                },
             },
+
+            actions: {
+                [VuexStorage.EVENT_DELETE](context, name) {
+                    // todo: context.delete(name)
+                }
+            }
         }
     }
 
-    vuexStore() {
+    vuexStore(name) {
         if (!this._vuexStore) {
-            this._vuexStore = this.makeVuexStore()
+            this._vuexStore = this.makeVuexStore(name)
         }
         return this._vuexStore
     }

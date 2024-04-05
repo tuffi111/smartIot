@@ -2,6 +2,7 @@
 
 import {ref} from "vue";
 import {ionSearch} from "@quasar/extras/ionicons-v7";
+import {User} from "@app/models/User.js";
 
 const rows = [
     {
@@ -173,6 +174,11 @@ const separator = ref('cell')
 const visibleColumns = ref(['calories', 'desc', 'fat', 'carbs', 'protein', 'sodium', 'calcium', 'iron'])
 const loading = ref(false)
 const filter= ref('')
+
+const user = new User().all()
+
+console.log()
+
 
 </script>
 

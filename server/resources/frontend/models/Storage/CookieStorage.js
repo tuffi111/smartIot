@@ -12,26 +12,32 @@ export class CookieStorage extends Storage {
 
     makeStore() {
         return {
-            load: () => {
-                let data = this.cookieStore().load(this.storageKey(this.model().name()))
-                if (data) {
-                    try {
-                        data = JSON.parse(data)
-                    } catch (error) {
-                        console.debug('Unsupported cookie data', error)
-                        data = null
+            find: (name, filter, order) => {
+                return new Promise((resolve) => {
+                    let data = this.cookieStore().load(this.storageKey(name))
+                    if (data) {
+                        try {
+                            data = JSON.parse(data)
+                        } catch (error) {
+                            console.error('Unsupported cookie data', error)
+                            data = null
+                        }
                     }
-                }
-
-                this.model().assignData(data??{})
+                    resolve(data ?? {})
+                })
             },
 
-            save: (data) => {
-                this.cookieStore().save(
-                    this.storageKey(this.model().name()),
-                    JSON.stringify(data)
-                )
-                return this
+            save: (name, data) => {
+                return new Promise((resolve) => {
+                    this.cookieStore().save(this.storageKey(name), JSON.stringify(data))
+                    resolve(data)
+                })
+            },
+
+            delete: (name) => {
+                return new Promise((resolve) => {
+                    resolve(this.cookieStore().delete(this.storageKey(name)))
+                })
             }
         }
     }
@@ -48,11 +54,6 @@ export class CookieStorage extends Storage {
 
     path(set) {
         this.cookieStore().path(set)
-        return this
-    }
-
-    delete() {
-        this.cookieStore().delete(this.storageKey(this.model().name()))
         return this
     }
 

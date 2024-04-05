@@ -99,7 +99,7 @@ const permissions = reactive([]);
         <template v-slot:footer>
             <q-tabs align="center" stretch>
                 <q-route-tab to="/devices" label="Devices" :icon="ionHardwareChipOutline"/>
-                <q-route-tab to="/examples" label="Examples" :icon="ionSearchCircleOutline"/>
+                <q-route-tab to="/admin" label="Admin" :icon="ionSearchCircleOutline"/>
                 <q-route-tab to="/scenarios" label="Scenarios" :icon="ionAppsOutline"/>
             </q-tabs>
 

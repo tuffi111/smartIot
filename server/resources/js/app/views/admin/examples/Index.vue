@@ -12,7 +12,7 @@ import {CookieDataModel} from "@app/models/examples/CookieDataModel";
 import {SessionDataModel} from "@app/models/examples/SessionDataModel";
 import ModelFormExample from "@app/components/ModelFormExample.vue";
 import {ionRefreshCircle} from "@quasar/extras/ionicons-v7";
-import {permissions} from "@/auth.js";
+import {permissions, authData} from "@/auth.js";
 
 const store = useStore()
 const apiModel = new ApiDataModel();
@@ -28,15 +28,15 @@ const basicModel = new Model({
     tags: {'tag-7': 'tag-7', 'tag-77': 'tag-77', 'tag-777': 'tag-777'},
     rights: ['read', 'write'],
     time: '17:00:00'
-})
+})/**/
 
 console.log('XXX - VUEX: store', store);
-console.log('XXX - MODELS: apiModel data', apiModel.data());
-console.log('XXX - MODELS: vuexModel data', vuexModel.data());
-console.log('XXX - MODELS: basicModel data', basicModel.data());
-console.log('XXX - MODELS: localModel data', localModel.data());
-console.log('XXX - MODELS: cookieModel data', cookieModel.data());
-console.log('XXX - MODELS: sessionModel data', sessionModel.data());
+console.log('XXX - MODELS: apiModel data', JSON.stringify(apiModel.data()));
+console.log('XXX - MODELS: vuexModel data', JSON.stringify(vuexModel.data()));
+console.log('XXX - MODELS: basicModel data', JSON.stringify(basicModel.data()));
+console.log('XXX - MODELS: localModel data', JSON.stringify(localModel.data()));
+console.log('XXX - MODELS: cookieModel data', JSON.stringify(cookieModel.data()));
+console.log('XXX - MODELS: sessionModel data', JSON.stringify(sessionModel.data()));
 
 onBeforeMount(() => {
     //FormDataApi.fetch()
@@ -49,6 +49,8 @@ onBeforeMount(() => {
 
     <input :value="permissions()['notifications']">
 
+    {{ authData().data() }}
+    <hr>
     {{ permissions() }}
 
     <h2>Storages</h2>
@@ -81,25 +83,25 @@ onBeforeMount(() => {
     <model-form-example :model="cookieModel"></model-form-example>
     <vue-json-pretty :data="cookieModel.data()" :deep="1"/>
 
-    <hr>
-    <h4>ApiStorage</h4>
-    <model-form-example :model="apiModel"></model-form-example>
-    <q-btn color="secondary" @click="apiModel.load()">Load</q-btn>
-    <q-btn color="primary" @click="apiModel.save()" :icon-right="apiModel.loading()?ionRefreshCircle:undefined" :disable="apiModel.loading()">
-        Save
-    </q-btn>
-    <vue-json-pretty :data="apiModel.data()" :deep="1"/>
+        <hr>
+        <h4>ApiStorage</h4>
+        <model-form-example :model="apiModel"></model-form-example>
+        <q-btn color="secondary" @click="apiModel.find()" :icon-right="apiModel.loading()?ionRefreshCircle:undefined" :disable="apiModel.loading()">Load</q-btn>
+        <q-btn color="primary" @click="apiModel.save()" :icon-right="apiModel.loading()?ionRefreshCircle:undefined" :disable="apiModel.loading()">
+            Save
+        </q-btn>
+        <vue-json-pretty :data="apiModel.data()" :deep="1"/>
 
 
-    <hr>
-    <h4>VuexStorage</h4>
-    <model-form-example :model="vuexModel"></model-form-example>
-    <vue-json-pretty :data="vuexModel.data()" :deep="0"/>
-    <hr>
+        <hr>
+        <h4>VuexStorage</h4>
+        <model-form-example :model="vuexModel"></model-form-example>
+        <vue-json-pretty :data="vuexModel.data()" :deep="0"/>
+        <hr>
 
-    <hr>
-    <h4>Global vuex store state</h4>
-    <vue-json-pretty :data="store.state" :deep="3"/>
-    <hr>
+        <hr>
+        <h4>Global vuex store state</h4>
+        <vue-json-pretty :data="store.state" :deep="3"/>
+        <hr>
 
 </template>

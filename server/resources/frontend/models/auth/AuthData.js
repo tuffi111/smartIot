@@ -1,6 +1,6 @@
 import {CookieModel} from "@/models/CookieModel.js";
 
-export class AuthModel extends CookieModel {
+export class AuthData extends CookieModel {
     name(){
         return 'AuthData'
     }

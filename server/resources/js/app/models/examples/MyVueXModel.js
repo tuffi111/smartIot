@@ -8,7 +8,7 @@ export class MyVueXModel extends Model {
     }
 
     makeStorage() {
-        return new VuexStorage()
+        return new VuexStorage(this)
     }
 
     model() {

@@ -1,57 +1,50 @@
 import {ref} from "vue";
 
 export class Storage {
-    static EVENT_CHANGED = 'changed'
-
     _storageKey = 'ModelStore'
     _store
+    _model
     _data
     _name
-    _bindings = {};
-    _loading = ref(false)
 
-    constructor(model = null) {
-        if (model) {
-            this.model(model)
-        }
+    constructor(model=null) {
+        if(model)this.model(model)
     }
 
     makeStore() {
         const store = {[this.storageKey()]: {}}
-
         return {
-            load: () => {
-                return store[this.storageKey()][this.model().name()]
+            find: (name, filter, order) => {
+                return new Promise((resolve, reject) => {
+                    resolve(store[this.storageKey()][name])
+                })
             },
-            save: (setData) => {
-                store[this.storageKey()][this.model().name()] = setData
-                this.raise(Storage.EVENT_CHANGED, setData)
-                return setData
+
+            save: (name, setData) => {
+                return new Promise((resolve, reject) => {
+                    store[this.storageKey()][name] = setData
+                    resolve(store[this.storageKey()][name])
+                })
+            },
+
+            delete: (name) => {
+                return new Promise((resolve, reject) => {
+                    resolve(delete store[this.storageKey()][name])
+                })
             }
         }
     }
 
-    get() {
-        this.store().load()
-        return this
+    find(name, filter = [], order = []) {
+        return this.store().find(name, filter, order)
     }
 
-    set(data) {
-        this.store().save(data)
-        return this
+    save(name, data) {
+        return this.store().save(name, data)
     }
 
-    raise(event, data, oldData) {
-        for (let handlerId in this._bindings[event]) {
-            this._bindings[event][handlerId].call(this, data, oldData)
-        }
-    }
-
-    bind(event, handler) {
-        if (!this._bindings[event]) {
-            this._bindings[event] = []
-        }
-        this._bindings[event].push(handler);
+    delete(name) {
+        return this.store().delete(name)
     }
 
     storageKey(name = null, concat = '/') {
@@ -82,17 +75,6 @@ export class Storage {
             return this._model
         }
         this._model = set
-        return this
-    }
-
-
-    loading(set = null) {
-        if (set === null) {
-            return this._loading.value
-        }
-
-        this._loading.value = !!set
-        this.model().loading(set)
         return this
     }
 }

@@ -27,7 +27,7 @@ Route::get('authtest', function (\Illuminate\Http\Request $request ){
 // auth
 Route::name('auth.')
     ->prefix('auth')
-    ->middleware([ForceJsonResponse::class, /*Language::class,*/])
+    //->middleware(/*[ForceJsonResponse::class,*/ /*Language::class,*/])
     ->group(function () {
         require('web/auth.php');
     });

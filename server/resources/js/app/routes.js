@@ -8,12 +8,6 @@ const routes = [
         children: [
             {path: '', component: () => import("@app/views/home/Index.vue")},
             {
-                path: '/examples',
-                component: () => import("@app/views/home/Examples.vue"),
-                children: [
-                    {path: '', component: () => import("@app/views/home/examples/Index.vue")},
-                ]
-            }, {
                 path: '/scenarios',
                 component: () => import("@app/views/home/Scenarios.vue"),
                 children: [
@@ -52,6 +46,13 @@ const routes = [
                     {path: 'oauth', component: () => import("@app/views/admin/System/OAuth.vue")},
                 ]
             },
+            {
+                path: 'examples',
+                component: () => import("@app/views/admin/Examples.vue"),
+                children: [
+                    {path: '', component: () => import("@app/views/admin/examples/Index.vue")},
+                ]
+            }
         ]
     },
     {path: '/settings', component: () => import("@app/views/Settings.vue"), meta: {auth: isAuth}},
